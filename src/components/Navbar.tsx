@@ -27,66 +27,71 @@ export default function Navbar() {
         position: "sticky",
         top: 0,
         zIndex: 40,
-        background: "rgba(9,9,11,0.85)",
-        backdropFilter: "blur(12px)",
+        background: "#FFFFFF",
         borderBottom: "1px solid var(--border)",
-        height: 52,
+        height: 56,
         display: "flex",
         alignItems: "center",
-        padding: "0 1.25rem",
+        padding: "0 1.375rem",
         gap: "0.75rem",
+        boxShadow: "0 1px 3px rgba(0,0,0,.05)",
       }}
     >
       {/* Brand */}
-      <Link href="/problems" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
+      <Link href="/learn" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
         <span
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 28,
-            height: 28,
+            width: 30,
+            height: 30,
             background: "var(--accent)",
-            borderRadius: 7,
+            borderRadius: 8,
             fontFamily: "var(--mono)",
-            fontWeight: 700,
-            fontSize: "0.75rem",
-            color: "#000",
+            fontWeight: 800,
+            fontSize: "0.72rem",
+            color: "#fff",
             flexShrink: 0,
+            boxShadow: "0 2px 6px rgba(22,163,74,.3)",
           }}
         >
-          TZ
+          TOI
         </span>
         <div>
-          <div style={{ fontWeight: 700, fontSize: "0.925rem", letterSpacing: "-0.02em", color: "var(--text)", lineHeight: 1.2 }}>
+          <div style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.02em", color: "var(--text)", lineHeight: 1.2 }}>
             TOI<span style={{ color: "var(--accent)" }}>·</span>Playground
           </div>
-          <div style={{ fontSize: "0.6rem", color: "var(--text3)", lineHeight: 1 }}>
+          <div style={{ fontSize: "0.58rem", color: "var(--text3)", lineHeight: 1, letterSpacing: "0.01em" }}>
             ทต.6 นครเชียงราย
           </div>
         </div>
       </Link>
 
-      {/* Spacer */}
       <div style={{ flex: 1 }} />
 
       {/* Nav links */}
-      {NAV.map(({ href, label }) => (
-        <Link
-          key={href}
-          href={href}
-          style={{
-            fontSize: "0.875rem",
-            fontWeight: 500,
-            color: pathname.startsWith(href) ? "var(--accent)" : "var(--text2)",
-            padding: "0.25rem 0.5rem",
-            borderRadius: 6,
-            transition: "color 0.15s",
-          }}
-        >
-          {label}
-        </Link>
-      ))}
+      {NAV.map(({ href, label }) => {
+        const active = pathname.startsWith(href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: active ? 600 : 400,
+              color: active ? "var(--accent)" : "var(--text2)",
+              padding: "0.3rem 0.625rem",
+              borderRadius: 7,
+              background: active ? "var(--accent-bg)" : "transparent",
+              border: active ? "1px solid var(--accent-bd)" : "1px solid transparent",
+              transition: "all 0.12s",
+            }}
+          >
+            {label}
+          </Link>
+        );
+      })}
 
       {/* User */}
       {user && (
@@ -95,9 +100,9 @@ export default function Navbar() {
             <Image
               src={user.photoURL}
               alt={user.displayName ?? "user"}
-              width={26}
-              height={26}
-              style={{ borderRadius: "50%" }}
+              width={28}
+              height={28}
+              style={{ borderRadius: "50%", border: "2px solid var(--accent-bd)" }}
             />
           )}
           <button
@@ -105,11 +110,11 @@ export default function Navbar() {
             style={{
               fontSize: "0.78rem",
               color: "var(--text3)",
-              background: "none",
-              border: "none",
+              background: "var(--surface2)",
+              border: "1px solid var(--border)",
+              borderRadius: 6,
               cursor: "pointer",
-              padding: "0.2rem 0.4rem",
-              borderRadius: 4,
+              padding: "0.25rem 0.6rem",
             }}
           >
             ออก

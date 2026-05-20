@@ -36,126 +36,124 @@ export default function LearnPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: "1.75rem 2rem 3rem", maxWidth: 780, margin: "0 auto" }}>
-
-        {/* ─── Page header ─── */}
-        <div style={{ marginBottom: "1.75rem" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.375rem",
-              padding: "0.25rem 0.625rem",
-              background: "#22c55e12",
-              border: "1px solid #22c55e28",
-              borderRadius: 20,
-              marginBottom: "0.75rem",
-            }}
-          >
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />
-            <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              C · C++ · Python
-            </span>
-          </div>
-          <h1
-            style={{
-              margin: "0 0 0.375rem",
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              letterSpacing: "-0.03em",
-              color: "var(--text)",
-            }}
-          >
+      {/* ─── Top bar ─── */}
+      <div
+        style={{
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--border)",
+          padding: "1.25rem 1.75rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <div>
+          <h1 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 700, letterSpacing: "-0.025em", color: "var(--text)" }}>
             บทเรียนทั้งหมด
           </h1>
-          <p style={{ margin: 0, color: "var(--text3)", fontSize: "0.875rem" }}>
-            เรียนรู้การเขียนโปรแกรมจากศูนย์ · เสร็จแล้ว {completedCount}/{LESSONS.length} บทเรียน
+          <p style={{ margin: "0.2rem 0 0", fontSize: "0.82rem", color: "var(--text3)" }}>
+            เรียนรู้การเขียนโปรแกรม C · C++ · Python จากศูนย์
           </p>
         </div>
 
-        {/* ─── Progress card ─── */}
+        {/* Mini progress pill */}
         <div
           style={{
-            background: "#111115",
-            border: "1px solid var(--border)",
-            borderRadius: 12,
-            padding: "1.25rem 1.5rem",
-            marginBottom: "1.75rem",
             display: "flex",
             alignItems: "center",
-            gap: "1.5rem",
-            flexWrap: "wrap",
+            gap: "0.625rem",
+            padding: "0.5rem 1rem",
+            background: "var(--accent-bg)",
+            border: "1px solid var(--accent-bd)",
+            borderRadius: 50,
           }}
         >
-          {/* Radial progress ring */}
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <svg width="72" height="72" viewBox="0 0 72 72">
-              <circle cx="36" cy="36" r="30" fill="none" stroke="var(--border)" strokeWidth="6" />
-              <circle
-                cx="36"
-                cy="36"
-                r="30"
-                fill="none"
-                stroke="var(--accent)"
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 30}`}
-                strokeDashoffset={`${2 * Math.PI * 30 * (1 - progressPct / 100)}`}
-                transform="rotate(-90 36 36)"
-                style={{ transition: "stroke-dashoffset 0.6s ease" }}
-              />
-            </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
+            {completedCount} / {LESSONS.length} บทเรียน
+          </span>
+        </div>
+      </div>
+
+      <div style={{ padding: "1.75rem" }}>
+
+        {/* ─── Stats + progress ─── */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr auto",
+            gap: "1rem",
+            marginBottom: "1.75rem",
+            alignItems: "stretch",
+          }}
+          className="stats-grid"
+        >
+          {[
+            { value: completedCount, label: "เสร็จแล้ว", color: "var(--accent)", bg: "var(--accent-bg)", bd: "var(--accent-bd)" },
+            { value: LESSONS.filter(l => progressMap[l.id]?.status === "in_progress").length, label: "กำลังเรียน", color: "var(--yellow)", bg: "var(--yellow-bg)", bd: "#FDE68A" },
+            { value: LESSONS.length - completedCount, label: "เหลืออยู่", color: "var(--text3)", bg: "var(--surface2)", bd: "var(--border)" },
+          ].map(({ value, label, color, bg, bd }) => (
             <div
+              key={label}
               style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
+                background: bg,
+                border: `1px solid ${bd}`,
+                borderRadius: 12,
+                padding: "1.125rem 1.25rem",
+                boxShadow: "var(--shadow-sm)",
               }}
             >
-              <span style={{ fontFamily: "var(--mono)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", lineHeight: 1 }}>
-                {progressPct}%
-              </span>
-            </div>
-          </div>
-
-          <div style={{ flex: 1, minWidth: 160 }}>
-            <div style={{ fontWeight: 600, fontSize: "0.975rem", color: "var(--text)", marginBottom: "0.25rem" }}>
-              ความคืบหน้าการเรียน
-            </div>
-            <div style={{ fontSize: "0.82rem", color: "var(--text3)", marginBottom: "0.75rem" }}>
-              เสร็จแล้ว {completedCount} จาก {LESSONS.length} บทเรียน
-            </div>
-            <div style={{ height: 6, background: "var(--border)", borderRadius: 6, overflow: "hidden" }}>
-              <div
-                style={{
-                  height: "100%",
-                  width: `${progressPct}%`,
-                  background: "linear-gradient(90deg, #16a34a, #22c55e)",
-                  borderRadius: 6,
-                  transition: "width 0.6s ease",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div style={{ display: "flex", gap: "1.25rem", flexShrink: 0 }}>
-            {[
-              { value: completedCount, label: "เสร็จแล้ว", color: "var(--accent)" },
-              { value: LESSONS.length - completedCount, label: "เหลืออยู่", color: "var(--text3)" },
-            ].map(({ value, label, color }) => (
-              <div key={label} style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--mono)", fontWeight: 700, fontSize: "1.5rem", color, lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: "0.68rem", color: "var(--text3)", marginTop: "0.25rem", fontWeight: 500 }}>{label}</div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: "1.75rem", fontWeight: 800, color, lineHeight: 1 }}>
+                {value}
               </div>
-            ))}
+              <div style={{ fontSize: "0.75rem", color: "var(--text3)", marginTop: "0.375rem", fontWeight: 500 }}>
+                {label}
+              </div>
+            </div>
+          ))}
+
+          {/* Progress ring */}
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+              padding: "1rem 1.25rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.875rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="22" fill="none" stroke="var(--border)" strokeWidth="5"/>
+              <circle
+                cx="28" cy="28" r="22"
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 22}`}
+                strokeDashoffset={`${2 * Math.PI * 22 * (1 - progressPct / 100)}`}
+                transform="rotate(-90 28 28)"
+                style={{ transition: "stroke-dashoffset 0.7s ease" }}
+              />
+              <text x="28" y="33" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--text)" fontFamily="var(--mono)">
+                {progressPct}%
+              </text>
+            </svg>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--text)" }}>ความคืบหน้า</div>
+              <div style={{ fontSize: "0.72rem", color: "var(--text3)", marginTop: "0.2rem" }}>รวมทั้งหมด</div>
+            </div>
           </div>
         </div>
 
-        {/* ─── Lesson list ─── */}
+        {/* ─── Lesson grid ─── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
           {LESSONS.map((lesson) => {
             const unlocked = isUnlocked(lesson.order);
@@ -167,60 +165,58 @@ export default function LearnPage() {
             const card = (
               <div
                 style={{
-                  background: "#111115",
-                  border: `1px solid ${done ? "#22c55e28" : "var(--border)"}`,
-                  borderRadius: 11,
+                  background: "var(--surface)",
+                  border: `1px solid ${done ? "var(--accent-bd)" : "var(--border)"}`,
+                  borderRadius: 12,
                   padding: "1rem 1.25rem",
                   display: "flex",
                   alignItems: "center",
                   gap: "1rem",
-                  opacity: unlocked ? 1 : 0.45,
-                  transition: "border-color 0.15s, transform 0.1s",
+                  opacity: unlocked ? 1 : 0.5,
                   cursor: unlocked ? "pointer" : "not-allowed",
+                  transition: "box-shadow 0.15s, border-color 0.15s, transform 0.1s",
+                  boxShadow: done ? "0 0 0 1px var(--accent-bd)44" : "var(--shadow-sm)",
                   position: "relative",
-                  overflow: "hidden",
                 }}
+                className={unlocked ? "lesson-card-hover" : ""}
               >
-                {/* Done left accent */}
                 {done && (
                   <div
                     style={{
                       position: "absolute",
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
+                      left: 0, top: 0, bottom: 0,
                       width: 3,
                       background: "var(--accent)",
-                      borderRadius: "11px 0 0 11px",
+                      borderRadius: "12px 0 0 12px",
                     }}
                   />
                 )}
 
-                {/* Lesson number / status badge */}
+                {/* Badge */}
                 <div
                   style={{
-                    width: 42,
-                    height: 42,
+                    width: 44,
+                    height: 44,
                     borderRadius: 10,
-                    background: done ? "#22c55e18" : inProgress ? "#eab30812" : "var(--surface2)",
-                    border: `1px solid ${done ? "#22c55e33" : inProgress ? "#eab30830" : "var(--border)"}`,
+                    background: done ? "var(--accent-bg)" : inProgress ? "var(--yellow-bg)" : "var(--surface2)",
+                    border: `1.5px solid ${done ? "var(--accent-bd)" : inProgress ? "#FDE68A" : "var(--border)"}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
                     fontFamily: "var(--mono)",
                     fontWeight: 700,
-                    fontSize: done ? "1rem" : "0.85rem",
-                    color: done ? "var(--accent)" : inProgress ? "var(--yellow)" : "var(--text2)",
+                    fontSize: "0.875rem",
+                    color: done ? "var(--accent)" : inProgress ? "var(--yellow)" : "var(--text3)",
                   }}
                 >
                   {!unlocked ? (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text3)" }}>
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                       <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                     </svg>
                   ) : done ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
                   ) : (
@@ -228,105 +224,42 @@ export default function LearnPage() {
                   )}
                 </div>
 
-                {/* Content */}
+                {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      marginBottom: "0.2rem",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "var(--mono)",
-                        fontSize: "0.68rem",
-                        color: "var(--text3)",
-                        fontWeight: 600,
-                      }}
-                    >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
+                    <span style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", color: "var(--text3)", fontWeight: 600, background: "var(--surface2)", padding: "0.1rem 0.4rem", borderRadius: 4, border: "1px solid var(--border)" }}>
                       {lesson.id}
                     </span>
                     {inProgress && (
-                      <span
-                        style={{
-                          fontSize: "0.63rem",
-                          fontWeight: 700,
-                          color: "var(--yellow)",
-                          background: "#eab30814",
-                          padding: "0.1rem 0.4rem",
-                          borderRadius: 4,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.06em",
-                        }}
-                      >
+                      <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "var(--yellow)", background: "var(--yellow-bg)", padding: "0.1rem 0.45rem", borderRadius: 4, border: "1px solid #FDE68A", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                         กำลังเรียน
                       </span>
                     )}
+                    {done && (
+                      <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "var(--accent)", background: "var(--accent-bg)", padding: "0.1rem 0.45rem", borderRadius: 4, border: "1px solid var(--accent-bd)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                        เสร็จแล้ว
+                      </span>
+                    )}
                   </div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      fontSize: "0.925rem",
-                      color: "var(--text)",
-                      marginBottom: "0.25rem",
-                    }}
-                  >
+                  <div style={{ fontWeight: 600, fontSize: "0.925rem", color: "var(--text)", marginBottom: "0.2rem" }}>
                     {lesson.title}
                   </div>
-                  <div
-                    style={{
-                      fontSize: "0.78rem",
-                      color: "var(--text3)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <div style={{ fontSize: "0.78rem", color: "var(--text3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {lesson.description}
                   </div>
                 </div>
 
-                {/* Right meta */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    gap: "0.375rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "0.68rem",
-                      fontFamily: "var(--mono)",
-                      color: "var(--text3)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                    }}
-                  >
+                {/* Right */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.375rem", flexShrink: 0 }}>
+                  <span style={{ fontSize: "0.68rem", fontFamily: "var(--mono)", color: "var(--text3)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                     </svg>
                     {lesson.estimatedMinutes} นาที
                   </span>
-
                   {unlocked && !done && (
-                    <span
-                      style={{
-                        fontSize: "0.72rem",
-                        fontWeight: 600,
-                        color: "var(--text3)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                      }}
-                    >
-                      เริ่มเลย
+                    <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--accent)", display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                      {inProgress ? "ต่อเลย" : "เริ่มเลย"}
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="9 18 15 12 9 6"/>
                       </svg>
@@ -337,11 +270,7 @@ export default function LearnPage() {
             );
 
             return unlocked ? (
-              <Link
-                key={lesson.id}
-                href={`/learn/${lesson.id}`}
-                style={{ textDecoration: "none", display: "block" }}
-              >
+              <Link key={lesson.id} href={`/learn/${lesson.id}`} style={{ textDecoration: "none", display: "block" }}>
                 {card}
               </Link>
             ) : (
@@ -350,18 +279,20 @@ export default function LearnPage() {
           })}
         </div>
 
-        <p
-          style={{
-            marginTop: "1.5rem",
-            fontSize: "0.75rem",
-            color: "var(--text3)",
-            textAlign: "center",
-            lineHeight: 1.6,
-          }}
-        >
+        <p style={{ marginTop: "1.5rem", fontSize: "0.75rem", color: "var(--text3)", textAlign: "center", lineHeight: 1.6 }}>
           แต่ละบทเรียนจะปลดล็อกหลังจากผ่านบทก่อนหน้า
         </p>
       </div>
+
+      <style>{`
+        .lesson-card-hover:hover {
+          box-shadow: var(--shadow) !important;
+          transform: translateY(-1px);
+        }
+        @media (max-width: 700px) {
+          .stats-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+      `}</style>
     </AppShell>
   );
 }

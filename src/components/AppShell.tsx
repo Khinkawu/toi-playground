@@ -11,7 +11,7 @@ const NAV = [
     href: "/learn",
     label: "เนื้อหา",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
@@ -21,7 +21,7 @@ const NAV = [
     href: "/problems",
     label: "ชาเลนจ์",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="16 18 22 12 16 6"/>
         <polyline points="8 6 2 12 8 18"/>
       </svg>
@@ -31,7 +31,7 @@ const NAV = [
     href: "/leaderboard",
     label: "อันดับ",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="18" y1="20" x2="18" y2="10"/>
         <line x1="12" y1="20" x2="12" y2="4"/>
         <line x1="6" y1="20" x2="6" y2="14"/>
@@ -56,9 +56,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {/* ─── Sidebar ─────────────────────────────────────────── */}
       <aside
         style={{
-          width: 240,
+          width: 248,
           flexShrink: 0,
-          background: "#111115",
+          background: "var(--sidebar)",
           borderRight: "1px solid var(--border)",
           display: "flex",
           flexDirection: "column",
@@ -66,10 +66,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
           top: 0,
           height: "100dvh",
           overflowY: "auto",
+          boxShadow: "1px 0 0 var(--border)",
         }}
       >
         {/* Logo area */}
-        <div style={{ padding: "1.25rem 1.25rem 1rem" }}>
+        <div style={{ padding: "1.375rem 1.375rem 1rem" }}>
           <Link
             href="/learn"
             style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}
@@ -79,16 +80,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 34,
-                height: 34,
+                width: 36,
+                height: 36,
                 background: "var(--accent)",
-                borderRadius: 9,
+                borderRadius: 10,
                 fontFamily: "var(--mono)",
                 fontWeight: 800,
-                fontSize: "0.82rem",
-                color: "#000",
+                fontSize: "0.78rem",
+                color: "#fff",
                 flexShrink: 0,
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.01em",
+                boxShadow: "0 2px 8px rgba(22,163,74,.35)",
               }}
             >
               TOI
@@ -97,22 +99,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
               <div
                 style={{
                   fontWeight: 700,
-                  fontSize: "0.925rem",
+                  fontSize: "0.975rem",
                   color: "var(--text)",
-                  letterSpacing: "-0.01em",
+                  letterSpacing: "-0.02em",
                   lineHeight: 1.2,
                 }}
               >
                 Playground
               </div>
-              <div
-                style={{
-                  fontSize: "0.62rem",
-                  color: "var(--text3)",
-                  lineHeight: 1.3,
-                  letterSpacing: "0.01em",
-                }}
-              >
+              <div style={{ fontSize: "0.62rem", color: "var(--text3)", letterSpacing: "0.01em" }}>
                 สอวน. คอมพิวเตอร์
               </div>
             </div>
@@ -122,56 +117,41 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <div
             style={{
               marginTop: "0.875rem",
-              padding: "0.5rem 0.625rem",
-              background: "var(--surface2)",
-              border: "1px solid var(--border)",
+              padding: "0.5rem 0.75rem",
+              background: "var(--accent-bg)",
+              border: "1px solid var(--accent-bd)",
               borderRadius: 8,
               display: "flex",
               alignItems: "center",
               gap: "0.5rem",
             }}
           >
-            <div
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: "var(--accent)",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: "0.7rem",
-                color: "var(--text2)",
-                lineHeight: 1.35,
-                fontWeight: 500,
-              }}
-            >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span style={{ fontSize: "0.7rem", color: "var(--accent-dim)", lineHeight: 1.35, fontWeight: 600 }}>
               โรงเรียนเทศบาล 6<br />นครเชียงราย
             </span>
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "var(--border)", margin: "0 1.25rem 0.75rem" }} />
-
-        {/* Nav label */}
+        {/* Nav section label */}
         <div
           style={{
-            padding: "0 1.25rem 0.375rem",
-            fontSize: "0.62rem",
+            padding: "0.125rem 1.375rem 0.5rem",
+            fontSize: "0.6rem",
             fontWeight: 700,
             color: "var(--text3)",
             textTransform: "uppercase",
-            letterSpacing: "0.1em",
+            letterSpacing: "0.12em",
           }}
         >
           เมนูหลัก
         </div>
 
         {/* Nav links */}
-        <nav style={{ padding: "0 0.75rem", display: "flex", flexDirection: "column", gap: "2px" }}>
+        <nav style={{ padding: "0 0.875rem", display: "flex", flexDirection: "column", gap: "2px" }}>
           {NAV.map(({ href, label, icon }) => {
             const active = pathname.startsWith(href);
             return (
@@ -182,9 +162,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   display: "flex",
                   alignItems: "center",
                   gap: "0.625rem",
-                  padding: "0.55rem 0.75rem",
-                  borderRadius: 8,
-                  background: active ? "#22c55e14" : "transparent",
+                  padding: "0.575rem 0.75rem",
+                  borderRadius: 9,
+                  background: active ? "var(--accent-bg)" : "transparent",
                   color: active ? "var(--accent)" : "var(--text2)",
                   fontSize: "0.875rem",
                   fontWeight: active ? 600 : 400,
@@ -201,13 +181,21 @@ export default function AppShell({ children }: { children: ReactNode }) {
                       top: "50%",
                       transform: "translateY(-50%)",
                       width: 3,
-                      height: 20,
-                      borderRadius: "0 2px 2px 0",
+                      height: 22,
+                      borderRadius: "0 3px 3px 0",
                       background: "var(--accent)",
                     }}
                   />
                 )}
-                <span style={{ opacity: active ? 1 : 0.6, display: "flex" }}>{icon}</span>
+                <span
+                  style={{
+                    opacity: active ? 1 : 0.55,
+                    display: "flex",
+                    color: active ? "var(--accent)" : "var(--text2)",
+                  }}
+                >
+                  {icon}
+                </span>
                 {label}
               </Link>
             );
@@ -218,18 +206,18 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div style={{ flex: 1 }} />
 
         {/* Divider */}
-        <div style={{ height: 1, background: "var(--border)", margin: "0 1.25rem 0.75rem" }} />
+        <div style={{ height: 1, background: "var(--border)", margin: "0 1.375rem 0.875rem" }} />
 
         {/* User area */}
         {user && (
-          <div style={{ padding: "0 0.75rem 1.25rem" }}>
+          <div style={{ padding: "0 0.875rem 1.375rem" }}>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.5rem 0.75rem",
-                borderRadius: 8,
+                gap: "0.625rem",
+                padding: "0.625rem 0.75rem",
+                borderRadius: 10,
                 background: "var(--surface2)",
                 border: "1px solid var(--border)",
               }}
@@ -238,23 +226,23 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <Image
                   src={user.photoURL}
                   alt={user.displayName ?? "user"}
-                  width={28}
-                  height={28}
-                  style={{ borderRadius: "50%", flexShrink: 0 }}
+                  width={30}
+                  height={30}
+                  style={{ borderRadius: "50%", flexShrink: 0, boxShadow: "0 0 0 2px var(--accent-bd)" }}
                 />
               ) : (
                 <div
                   style={{
-                    width: 28,
-                    height: 28,
+                    width: 30,
+                    height: 30,
                     borderRadius: "50%",
-                    background: "var(--border2)",
+                    background: "var(--accent)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "0.75rem",
+                    fontSize: "0.78rem",
                     fontWeight: 700,
-                    color: "var(--text2)",
+                    color: "#fff",
                     flexShrink: 0,
                   }}
                 >
@@ -264,7 +252,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: "0.78rem",
+                    fontSize: "0.8rem",
                     fontWeight: 600,
                     color: "var(--text)",
                     overflow: "hidden",
@@ -299,7 +287,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 padding: "0.45rem 0.75rem",
                 background: "transparent",
                 border: "none",
-                borderRadius: 7,
+                borderRadius: 8,
                 color: "var(--text3)",
                 fontSize: "0.78rem",
                 cursor: "pointer",
@@ -307,7 +295,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 textAlign: "left",
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                 <polyline points="16 17 21 12 16 7"/>
                 <line x1="21" y1="12" x2="9" y2="12"/>
@@ -318,15 +306,16 @@ export default function AppShell({ children }: { children: ReactNode }) {
         )}
       </aside>
 
-      {/* ─── Main content ─────────────────────────────────────── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflowY: "auto" }}>
+      {/* ─── Main ─────────────────────────────────────────────── */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <main style={{ flex: 1 }}>{children}</main>
 
         {/* Footer */}
         <footer
           style={{
-            padding: "0.875rem 1.5rem",
+            padding: "0.875rem 1.75rem",
             borderTop: "1px solid var(--border)",
+            background: "var(--surface)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",

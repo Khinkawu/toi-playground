@@ -27,28 +27,29 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        background: "var(--bg)",
-      }}
-    >
-      {/* ─── Left panel (branding) ─── */}
+    <div style={{ minHeight: "100dvh", display: "flex", background: "#F2F4F8" }}>
+
+      {/* ─── Left panel ─── */}
       <div
         style={{
-          display: "none",
           flex: "0 0 420px",
+          display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "3rem",
-          background: "#111115",
-          borderRight: "1px solid var(--border)",
+          padding: "2.5rem",
+          background: "linear-gradient(160deg, #14532D 0%, #16A34A 60%, #22C55E 100%)",
+          position: "relative",
+          overflow: "hidden",
         }}
-        className="login-left"
+        className="login-left-panel"
       >
+        {/* Background decoration */}
+        <div style={{ position: "absolute", top: -60, right: -60, width: 280, height: 280, borderRadius: "50%", background: "rgba(255,255,255,.07)" }} />
+        <div style={{ position: "absolute", bottom: -80, left: -40, width: 320, height: 320, borderRadius: "50%", background: "rgba(0,0,0,.06)" }} />
+        <div style={{ position: "absolute", top: "40%", right: "15%", width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,.05)" }} />
+
         {/* Logo */}
-        <div>
+        <div style={{ position: "relative", zIndex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "3rem" }}>
             <span
               style={{
@@ -57,79 +58,75 @@ export default function LoginPage() {
                 justifyContent: "center",
                 width: 44,
                 height: 44,
-                background: "var(--accent)",
-                borderRadius: 11,
+                background: "rgba(255,255,255,.2)",
+                border: "1px solid rgba(255,255,255,.3)",
+                backdropFilter: "blur(8px)",
+                borderRadius: 12,
                 fontFamily: "var(--mono)",
                 fontWeight: 800,
-                fontSize: "0.95rem",
-                color: "#000",
-                letterSpacing: "-0.02em",
+                fontSize: "0.9rem",
+                color: "#fff",
+                letterSpacing: "-0.01em",
               }}
             >
               TOI
             </span>
             <div>
-              <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--text)" }}>Playground</div>
-              <div style={{ fontSize: "0.7rem", color: "var(--text3)" }}>สอวน. คอมพิวเตอร์</div>
+              <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "#fff" }}>Playground</div>
+              <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,.7)" }}>สอวน. คอมพิวเตอร์</div>
             </div>
           </div>
 
-          <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.75rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.25, letterSpacing: "-0.03em" }}>
+          <h2 style={{ margin: "0 0 0.875rem", fontSize: "2rem", fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: "-0.03em" }}>
             ฝึกโค้ด<br />เตรียมสอบ สอวน.
           </h2>
-          <p style={{ margin: "0 0 2rem", color: "var(--text2)", fontSize: "0.925rem", lineHeight: 1.65 }}>
-            แพลตฟอร์มสำหรับนักเรียนโปรแกรมมิ่ง เรียนรู้ C, C++ และ Python ผ่านบทเรียนและโจทย์จริง
+          <p style={{ margin: "0 0 2rem", color: "rgba(255,255,255,.8)", fontSize: "0.9rem", lineHeight: 1.65 }}>
+            เรียนรู้ C, C++ และ Python ผ่านบทเรียนเชิงลึกและโจทย์จริง พร้อมระบบตรวจอัตโนมัติ
           </p>
 
-          {/* Features */}
           {[
-            { icon: "📚", text: "บทเรียนจากศูนย์ — ครอบคลุม C, C++, Python" },
-            { icon: "⚡", text: "โจทย์ระดับ A1–A3 พร้อม Judge อัตโนมัติ" },
-            { icon: "🏆", text: "ระบบคะแนนและอันดับ" },
-          ].map(({ icon, text }) => (
+            { n: "9", label: "บทเรียน" },
+            { n: "C/C++/Py", label: "3 ภาษา" },
+            { n: "Auto", label: "Judge" },
+          ].map(({ n, label }) => (
             <div
-              key={text}
+              key={label}
               style={{
-                display: "flex",
+                display: "inline-flex",
+                flexDirection: "column",
                 alignItems: "center",
-                gap: "0.75rem",
-                marginBottom: "0.875rem",
-                padding: "0.625rem 0.875rem",
-                background: "var(--surface2)",
-                border: "1px solid var(--border)",
-                borderRadius: 9,
+                marginRight: "1.5rem",
+                marginBottom: "1rem",
               }}
             >
-              <span style={{ fontSize: "1.1rem", flexShrink: 0 }}>{icon}</span>
-              <span style={{ fontSize: "0.85rem", color: "var(--text2)", lineHeight: 1.45 }}>{text}</span>
+              <span style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff", fontFamily: "var(--mono)", lineHeight: 1 }}>{n}</span>
+              <span style={{ fontSize: "0.68rem", color: "rgba(255,255,255,.65)", fontWeight: 500, marginTop: "0.1rem" }}>{label}</span>
             </div>
           ))}
         </div>
 
-        {/* School info */}
-        <div>
+        {/* School */}
+        <div style={{ position: "relative", zIndex: 1 }}>
           <div
             style={{
               padding: "0.875rem 1rem",
-              background: "var(--surface2)",
-              border: "1px solid var(--border)",
-              borderRadius: 9,
+              background: "rgba(255,255,255,.15)",
+              border: "1px solid rgba(255,255,255,.25)",
+              borderRadius: 10,
+              backdropFilter: "blur(8px)",
             }}
           >
-            <div style={{ fontSize: "0.68rem", color: "var(--text3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.3rem" }}>
+            <div style={{ fontSize: "0.65rem", color: "rgba(255,255,255,.65)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>
               โรงเรียน
             </div>
-            <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)" }}>
+            <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>
               โรงเรียนเทศบาล 6 นครเชียงราย
             </div>
-          </div>
-          <div style={{ marginTop: "1rem", fontSize: "0.7rem", color: "var(--text3)" }}>
-            Powered by <span style={{ color: "var(--accent)", fontWeight: 600 }}>Kawin</span> &amp; <span style={{ color: "var(--accent)", fontWeight: 600 }}>Oracle Family</span>
           </div>
         </div>
       </div>
 
-      {/* ─── Right panel (login form) ─── */}
+      {/* ─── Right panel ─── */}
       <div
         style={{
           flex: 1,
@@ -137,11 +134,11 @@ export default function LoginPage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "2rem",
+          padding: "2.5rem 2rem",
         }}
       >
-        {/* Mobile logo */}
-        <div style={{ marginBottom: "2.5rem", textAlign: "center" }} className="login-mobile-logo">
+        {/* Mobile logo (hidden on desktop via CSS) */}
+        <div style={{ marginBottom: "2rem", textAlign: "center" }} className="login-mobile-logo">
           <div
             style={{
               display: "inline-flex",
@@ -154,17 +151,16 @@ export default function LoginPage() {
               fontFamily: "var(--mono)",
               fontWeight: 800,
               fontSize: "1rem",
-              color: "#000",
-              marginBottom: "0.875rem",
-              letterSpacing: "-0.02em",
+              color: "#fff",
+              marginBottom: "0.75rem",
             }}
           >
             TOI
           </div>
-          <div style={{ fontWeight: 700, fontSize: "1.4rem", color: "var(--text)", letterSpacing: "-0.02em" }}>
+          <div style={{ fontWeight: 700, fontSize: "1.35rem", color: "var(--text)", letterSpacing: "-0.02em" }}>
             TOI<span style={{ color: "var(--accent)" }}>·</span>Playground
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--text3)", marginTop: "0.25rem" }}>
+          <div style={{ fontSize: "0.78rem", color: "var(--text3)", marginTop: "0.25rem" }}>
             โรงเรียนเทศบาล 6 นครเชียงราย
           </div>
         </div>
@@ -174,25 +170,27 @@ export default function LoginPage() {
           style={{
             width: "100%",
             maxWidth: 400,
-            background: "#111115",
+            background: "#FFFFFF",
             border: "1px solid var(--border)",
-            borderRadius: 14,
-            padding: "2rem",
+            borderRadius: 16,
+            padding: "2.25rem",
+            boxShadow: "0 8px 32px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.04)",
           }}
         >
-          <h2 style={{ margin: "0 0 0.375rem", fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
+          <h2 style={{ margin: "0 0 0.375rem", fontSize: "1.35rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text)" }}>
             เข้าสู่ระบบ
           </h2>
-          <p style={{ margin: "0 0 1.75rem", color: "var(--text3)", fontSize: "0.85rem", lineHeight: 1.5 }}>
+          <p style={{ margin: "0 0 1.75rem", color: "var(--text3)", fontSize: "0.85rem", lineHeight: 1.55 }}>
             ใช้อีเมลโรงเรียน{" "}
             <code
               style={{
                 fontFamily: "var(--mono)",
-                background: "var(--surface2)",
+                background: "var(--accent-bg)",
+                color: "var(--accent)",
                 padding: "0.1em 0.4em",
                 borderRadius: 4,
                 fontSize: "0.82em",
-                color: "var(--accent)",
+                border: "1px solid var(--accent-bd)",
               }}
             >
               @tesaban6.ac.th
@@ -208,29 +206,21 @@ export default function LoginPage() {
               alignItems: "center",
               justifyContent: "center",
               gap: "0.625rem",
-              padding: "0.8rem 1rem",
-              background: busy ? "var(--surface2)" : "#fff",
-              color: busy ? "var(--text2)" : "#1a1a1a",
-              border: "1px solid var(--border2)",
-              borderRadius: 9,
+              padding: "0.85rem 1rem",
+              background: busy ? "#F3F4F6" : "#FFFFFF",
+              color: busy ? "var(--text3)" : "#1F2937",
+              border: "1.5px solid #E5E7EB",
+              borderRadius: 10,
               fontFamily: "var(--sans)",
               fontSize: "0.925rem",
               fontWeight: 600,
               cursor: busy ? "not-allowed" : "pointer",
               transition: "all 0.15s",
+              boxShadow: busy ? "none" : "0 1px 4px rgba(0,0,0,.06)",
               letterSpacing: "-0.01em",
             }}
           >
-            {busy ? (
-              <>
-                <Spinner /> กำลังเข้าสู่ระบบ…
-              </>
-            ) : (
-              <>
-                <GoogleIcon />
-                เข้าสู่ระบบด้วย Google
-              </>
-            )}
+            {busy ? <><Spinner /> กำลังเข้าสู่ระบบ…</> : <><GoogleIcon /> เข้าสู่ระบบด้วย Google</>}
           </button>
 
           {err && (
@@ -238,8 +228,8 @@ export default function LoginPage() {
               style={{
                 marginTop: "1rem",
                 padding: "0.625rem 0.875rem",
-                background: "#1a0808",
-                border: "1px solid #ef444433",
+                background: "var(--red-bg)",
+                border: "1px solid var(--red-bd)",
                 borderRadius: 8,
                 color: "var(--red)",
                 fontSize: "0.82rem",
@@ -255,26 +245,31 @@ export default function LoginPage() {
               marginTop: "1.5rem",
               paddingTop: "1.25rem",
               borderTop: "1px solid var(--border)",
-              fontSize: "0.75rem",
+              fontSize: "0.74rem",
               color: "var(--text3)",
-              lineHeight: 1.55,
+              lineHeight: 1.6,
+              textAlign: "center",
             }}
           >
             ระบบนี้สำหรับนักเรียน{" "}
             <span style={{ color: "var(--text2)", fontWeight: 500 }}>โรงเรียนเทศบาล 6 นครเชียงราย</span>{" "}
-            เท่านั้น · ห้ามแชร์บัญชีกับบุคคลอื่น
+            เท่านั้น
           </div>
         </div>
 
-        <div style={{ marginTop: "2rem", fontSize: "0.7rem", color: "var(--text3)" }}>
-          Powered by <span style={{ color: "var(--accent)", fontWeight: 600 }}>Kawin</span> &amp; <span style={{ color: "var(--accent)", fontWeight: 600 }}>Oracle Family</span>
+        <div style={{ marginTop: "1.75rem", fontSize: "0.7rem", color: "var(--text3)" }}>
+          Powered by{" "}
+          <span style={{ color: "var(--accent)", fontWeight: 600 }}>Kawin</span>
+          {" & "}
+          <span style={{ color: "var(--accent)", fontWeight: 600 }}>Oracle Family</span>
         </div>
       </div>
 
       <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 767px) {
+          .login-left-panel { display: none !important; }
+        }
         @media (min-width: 768px) {
-          .login-left { display: flex !important; }
           .login-mobile-logo { display: none !important; }
         }
       `}</style>
@@ -289,8 +284,8 @@ function Spinner() {
         display: "inline-block",
         width: 16,
         height: 16,
-        border: "2px solid #ccc4",
-        borderTop: "2px solid #555",
+        border: "2px solid #D1D5DB",
+        borderTop: "2px solid #6B7280",
         borderRadius: "50%",
         animation: "spin 0.7s linear infinite",
       }}
