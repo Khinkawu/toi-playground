@@ -143,3 +143,59 @@ export async function getAllUsers(): Promise<UserRecord[]> {
   const snaps = await getDocs(collection(db, "users"));
   return snaps.docs.map((s) => s.data() as UserRecord);
 }
+
+// ─── Lesson Progress ───────────────────────────────────────────────────────
+
+export interface LessonProgress {
+  completedExercises: string[];
+  status: "not_started" | "in_progress" | "completed";
+}
+
+export async function getLessonProgress(
+  uid: string,
+  lessonId: string
+): Promise<LessonProgress | null> {
+  const ref = doc(db, "users", uid, "lessonProgress", lessonId);
+  const snap = await getDoc(ref);
+  return snap.exists() ? (snap.data() as LessonProgress) : null;
+}
+
+export async function markExercisePassed(
+  uid: string,
+  lessonId: string,
+  exerciseId: string,
+  totalExercises: number
+): Promise<void> {
+  const ref = doc(db, "users", uid, "lessonProgress", lessonId);
+  const snap = await getDoc(ref);
+
+  let completedExercises: string[] = [];
+  if (snap.exists()) {
+    completedExercises = (snap.data() as LessonProgress).completedExercises ?? [];
+  }
+
+  if (!completedExercises.includes(exerciseId)) {
+    completedExercises = [...completedExercises, exerciseId];
+  }
+
+  const allDone = completedExercises.length >= totalExercises;
+  const status: LessonProgress["status"] = allDone
+    ? "completed"
+    : completedExercises.length > 0
+    ? "in_progress"
+    : "not_started";
+
+  await setDoc(ref, { completedExercises, status });
+}
+
+export async function getAllLessonProgress(
+  uid: string
+): Promise<Record<string, LessonProgress>> {
+  const col = collection(db, "users", uid, "lessonProgress");
+  const snaps = await getDocs(col);
+  const result: Record<string, LessonProgress> = {};
+  snaps.forEach((s) => {
+    result[s.id] = s.data() as LessonProgress;
+  });
+  return result;
+}

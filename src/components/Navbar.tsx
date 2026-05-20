@@ -6,7 +6,8 @@ import { useAuth } from "@/lib/auth";
 import Image from "next/image";
 
 const NAV = [
-  { href: "/problems", label: "โจทย์" },
+  { href: "/learn", label: "เนื้อหา" },
+  { href: "/problems", label: "ชาเลนจ์" },
   { href: "/leaderboard", label: "อันดับ" },
 ];
 
