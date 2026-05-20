@@ -114,13 +114,14 @@ export default function ProblemsPage() {
                 style={{
                   padding: "0.3rem 0.875rem",
                   fontSize: "0.82rem",
-                  fontWeight: 500,
+                  fontWeight: filter === l ? 700 : 500,
                   background: filter === l ? "var(--accent)" : "var(--surface)",
-                  color: filter === l ? "#000" : "var(--text2)",
+                  color: filter === l ? "#fff" : "var(--text2)",
                   border: `1px solid ${filter === l ? "var(--accent)" : "var(--border)"}`,
-                  borderRadius: 6,
+                  borderRadius: 8,
                   cursor: "pointer",
                   transition: "all 0.15s",
+                  boxShadow: filter === l ? "var(--shadow-sm)" : "none",
                 }}
               >
                 {l === "all" ? "ทั้งหมด" : l}{" "}
@@ -147,12 +148,13 @@ export default function ProblemsPage() {
             style={{
               background: "var(--surface)",
               border: "1px solid var(--border)",
-              borderRadius: 6,
+              borderRadius: 8,
               color: "var(--text)",
               fontSize: "0.82rem",
               padding: "0.3rem 0.75rem",
               outline: "none",
               width: 160,
+              boxShadow: "var(--shadow-sm)",
             }}
           />
         </div>
@@ -166,6 +168,10 @@ export default function ProblemsPage() {
                 textAlign: "center",
                 color: "var(--text3)",
                 fontSize: "0.875rem",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                boxShadow: "var(--shadow-sm)",
               }}
             >
               ไม่พบโจทย์ที่ตรงกับการค้นหา

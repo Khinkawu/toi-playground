@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { PROBLEM_MAP } from "@/data/problems";
-import { getProgress, markAttempted, markSolved, ProgressRecord } from "@/lib/firestore";
+import { getProgress, markAttempted, markSolved } from "@/lib/firestore";
 import { Language } from "@/lib/piston";
 import Editor, { DEFAULT_CODE } from "@/components/Editor";
 import RunPanel from "@/components/RunPanel";
@@ -13,7 +13,11 @@ import AppShell from "@/components/AppShell";
 import Link from "next/link";
 
 const LANG_LABELS: Record<Language, string> = { cpp: "C++", c: "C", python: "Python" };
-const LEVEL_COLOR: Record<string, string> = { A1: "#22c55e", A2: "#eab308", A3: "#ef4444" };
+const LEVEL_STYLE: Record<string, { color: string; bg: string; border: string }> = {
+  A1: { color: "var(--accent)", bg: "var(--accent-bg)", border: "var(--accent-bd)" },
+  A2: { color: "var(--yellow)", bg: "var(--yellow-bg)", border: "#FDE68A" },
+  A3: { color: "var(--red)", bg: "var(--red-bg)", border: "var(--red-bd)" },
+};
 
 export default function ProblemPage() {
   const { user, loading } = useAuth();
@@ -27,7 +31,6 @@ export default function ProblemPage() {
     c: DEFAULT_CODE.c,
     python: DEFAULT_CODE.python,
   });
-  const [progress, setProgress] = useState<ProgressRecord | null>(null);
   const [leftTab, setLeftTab] = useState<"problem" | "hints">("problem");
   const [solved, setSolved] = useState(false);
 
@@ -38,7 +41,6 @@ export default function ProblemPage() {
   useEffect(() => {
     if (!user || !problem) return;
     getProgress(user.uid, problem.id).then((p) => {
-      setProgress(p);
       if (p?.code && p.language) {
         setLanguage(p.language as Language);
         setCode((prev) => ({ ...prev, [p.language]: p.code }));
@@ -67,6 +69,8 @@ export default function ProblemPage() {
       </AppShell>
     );
   }
+
+  const levelStyle = LEVEL_STYLE[problem.level];
 
   return (
     <AppShell>
@@ -103,8 +107,9 @@ export default function ProblemPage() {
               fontSize: "0.72rem",
               fontWeight: 700,
               fontFamily: "var(--mono)",
-              color: LEVEL_COLOR[problem.level],
-              background: LEVEL_COLOR[problem.level] + "18",
+              color: levelStyle.color,
+              background: levelStyle.bg,
+              border: `1px solid ${levelStyle.border}`,
               padding: "0.1rem 0.4rem",
               borderRadius: 4,
             }}
@@ -122,10 +127,10 @@ export default function ProblemPage() {
                 fontSize: "0.72rem",
                 fontWeight: 600,
                 color: "var(--accent)",
-                background: "#22c55e18",
+                background: "var(--accent-bg)",
                 padding: "0.15rem 0.5rem",
                 borderRadius: 4,
-                border: "1px solid #22c55e33",
+                border: "1px solid var(--accent-bd)",
               }}
             >
               ✓ ผ่านแล้ว
@@ -145,11 +150,12 @@ export default function ProblemPage() {
                   fontSize: "0.78rem",
                   fontFamily: "var(--mono)",
                   fontWeight: 500,
-                  background: language === l ? "var(--surface2)" : "none",
-                  color: language === l ? "var(--text)" : "var(--text3)",
-                  border: language === l ? "1px solid var(--border2)" : "1px solid transparent",
-                  borderRadius: 5,
+                  background: language === l ? "var(--accent-bg)" : "transparent",
+                  color: language === l ? "var(--accent)" : "var(--text3)",
+                  border: language === l ? "1px solid var(--accent-bd)" : "1px solid transparent",
+                  borderRadius: 6,
                   cursor: "pointer",
+                  boxShadow: language === l ? "var(--shadow-sm)" : "none",
                 }}
               >
                 {LANG_LABELS[l]}
@@ -169,6 +175,7 @@ export default function ProblemPage() {
               flexDirection: "column",
               borderRight: "1px solid var(--border)",
               overflow: "hidden",
+              background: "var(--surface)",
             }}
           >
             {/* Tabs */}
@@ -190,11 +197,12 @@ export default function ProblemPage() {
                     padding: "0.2rem 0.625rem",
                     fontSize: "0.8rem",
                     fontWeight: 500,
-                    background: leftTab === t ? "var(--surface2)" : "none",
+                    background: leftTab === t ? "var(--surface)" : "transparent",
                     color: leftTab === t ? "var(--text)" : "var(--text3)",
-                    border: leftTab === t ? "1px solid var(--border2)" : "1px solid transparent",
-                    borderRadius: 5,
+                    border: leftTab === t ? "1px solid var(--border)" : "1px solid transparent",
+                    borderRadius: 6,
                     cursor: "pointer",
+                    boxShadow: leftTab === t ? "var(--shadow-sm)" : "none",
                   }}
                 >
                   {t === "problem" ? "โจทย์" : "Hints"}
@@ -256,11 +264,12 @@ export default function ProblemPage() {
                           background: "var(--surface2)",
                           border: "1px solid var(--border)",
                           borderLeft: "3px solid var(--blue)",
-                          borderRadius: "0 6px 6px 0",
+                          borderRadius: "0 12px 12px 0",
                           padding: "0.625rem 0.875rem",
                           marginBottom: "0.625rem",
                           fontSize: "0.875rem",
                           color: "var(--text2)",
+                          boxShadow: "var(--shadow-sm)",
                         }}
                       >
                         <strong style={{ color: "var(--blue)", fontFamily: "var(--mono)", fontSize: "0.78rem" }}>
@@ -328,15 +337,16 @@ function IOBox({ label, value }: { label: string; value: string }) {
       <pre
         style={{
           margin: 0,
-          background: "#040407",
+          background: "var(--surface2)",
           border: "1px solid var(--border)",
-          borderRadius: 6,
+          borderRadius: 8,
           padding: "0.5rem 0.625rem",
           fontFamily: "var(--mono)",
           fontSize: "0.8rem",
-          color: "#e2e8f0",
+          color: "var(--text)",
           whiteSpace: "pre-wrap",
           wordBreak: "break-all",
+          boxShadow: "var(--shadow-sm)",
         }}
       >
         {value}

@@ -99,7 +99,11 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
   const toggleExpand = (tc: number) => {
     setExpanded((prev) => {
       const next = new Set(prev);
-      next.has(tc) ? next.delete(tc) : next.add(tc);
+      if (next.has(tc)) {
+        next.delete(tc);
+      } else {
+        next.add(tc);
+      }
       return next;
     });
   };
@@ -111,14 +115,15 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
 
       {/* Tab bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.4rem 0.75rem", borderBottom: "1px solid var(--border)", flexShrink: 0, background: "#111113" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.4rem 0.75rem", borderBottom: "1px solid var(--border)", flexShrink: 0, background: "var(--surface2)" }}>
         {(["run", "judge"] as Tab[]).map((t) => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: "0.2rem 0.65rem", fontSize: "0.78rem", fontWeight: 600,
-            background: tab === t ? "#1e1e23" : "transparent",
+            background: tab === t ? "var(--surface)" : "transparent",
             color: tab === t ? "var(--text)" : "var(--text3)",
-            border: tab === t ? "1px solid var(--border2)" : "1px solid transparent",
-            borderRadius: 5, cursor: "pointer",
+            border: tab === t ? "1px solid var(--border)" : "1px solid transparent",
+            borderRadius: 6, cursor: "pointer",
+            boxShadow: tab === t ? "var(--shadow-sm)" : "none",
           }}>
             {t === "run" ? "▶  Run" : "✓  Judge"}
           </button>
@@ -132,9 +137,10 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
           disabled={busy}
           style={{
             padding: "0.3rem 0.875rem", fontSize: "0.8rem", fontWeight: 700,
-            background: busy ? "#1a1a1f" : tab === "run" ? "var(--accent)" : "#3b82f6",
-            color: busy ? "var(--text3)" : "#000",
-            border: "none", borderRadius: 5, cursor: busy ? "not-allowed" : "pointer",
+            background: busy ? "var(--surface2)" : tab === "run" ? "var(--accent)" : "var(--blue)",
+            color: busy ? "var(--text3)" : "#fff",
+            border: busy ? "1px solid var(--border)" : "1px solid transparent",
+            borderRadius: 6, cursor: busy ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", gap: "0.375rem",
             transition: "background 0.1s",
             opacity: busy ? 0.6 : 1,
@@ -159,8 +165,8 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
                   {problem.examples.map((ex, i) => (
                     <button key={i} onClick={() => setStdin(ex.input)} style={{
                       fontSize: "0.65rem", padding: "0.1rem 0.45rem",
-                      background: stdin === ex.input ? "#22c55e22" : "var(--surface2)",
-                      border: `1px solid ${stdin === ex.input ? "#22c55e44" : "var(--border)"}`,
+                      background: stdin === ex.input ? "var(--accent-bg)" : "var(--surface2)",
+                      border: `1px solid ${stdin === ex.input ? "var(--accent-bd)" : "var(--border)"}`,
                       borderRadius: 3, color: stdin === ex.input ? "var(--accent)" : "var(--text3)", cursor: "pointer",
                     }}>
                       {ex.label ?? `ตย.${i + 1}`}
@@ -175,10 +181,11 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
                 spellCheck={false}
                 style={{
                   width: "100%", boxSizing: "border-box",
-                  background: "#0c0c10", border: "1px solid var(--border)",
-                  borderRadius: 5, color: "var(--text)", fontFamily: "var(--mono)",
+                  background: "var(--surface)", border: "1px solid var(--border)",
+                  borderRadius: 8, color: "var(--text)", fontFamily: "var(--mono)",
                   fontSize: "0.82rem", padding: "0.4rem 0.625rem",
                   resize: "vertical", outline: "none", lineHeight: 1.5,
+                  boxShadow: "var(--shadow-sm)",
                 }}
               />
             </div>
@@ -188,20 +195,20 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>output</span>
                 {result && (
-                  <span style={{ fontSize: "0.65rem", fontFamily: "var(--mono)", color: result.isCompileError ? "var(--red)" : result.code !== 0 && result.code !== null ? "#f97316" : "var(--text3)" }}>
+                  <span style={{ fontSize: "0.65rem", fontFamily: "var(--mono)", color: result.isCompileError ? "var(--red)" : result.code !== 0 && result.code !== null ? "var(--yellow)" : "var(--text3)" }}>
                     {result.isCompileError ? "● compile error" : result.signal ? `● ${result.signal}` : result.code !== null && result.code !== 0 ? `● exit ${result.code}` : result.elapsed ? `${result.elapsed}ms` : ""}
                   </span>
                 )}
               </div>
 
               {!result && !busy && (
-                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text3)", fontSize: "0.8rem", background: "#0c0c10", borderRadius: 5, border: "1px solid var(--border)", minHeight: 80 }}>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text3)", fontSize: "0.8rem", background: "var(--surface2)", borderRadius: 8, border: "1px solid var(--border)", minHeight: 80 }}>
                   กด Run เพื่อดู output
                 </div>
               )}
 
               {busy && (
-                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "var(--text3)", fontSize: "0.8rem", background: "#0c0c10", borderRadius: 5, border: "1px solid var(--border)", minHeight: 80 }}>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "var(--text3)", fontSize: "0.8rem", background: "var(--surface2)", borderRadius: 8, border: "1px solid var(--border)", minHeight: 80 }}>
                   <MiniSpinner /> กำลังรัน…
                 </div>
               )}
@@ -258,8 +265,8 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
             {judged && (
               <div style={{
                 padding: "0.5rem 0.75rem", borderRadius: 6, fontSize: "0.82rem", fontWeight: 700, textAlign: "center",
-                background: allPassed ? "#0a1a0a" : "#1a0a0a",
-                border: `1px solid ${allPassed ? "#22c55e44" : "#ef444444"}`,
+                background: allPassed ? "var(--accent-bg)" : "var(--red-bg)",
+                border: `1px solid ${allPassed ? "var(--accent-bd)" : "var(--red-bd)"}`,
                 color: allPassed ? "var(--accent)" : "var(--red)",
               }}>
                 {allPassed ? `🎉 ผ่านทุก test case (${judgeItems.length}/${judgeItems.length})` : `ผ่าน ${passedCount}/${judgeItems.length} test case`}
@@ -268,7 +275,7 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
 
             {/* Test case list */}
             {judgeItems.map((r) => (
-              <div key={r.tc} style={{ borderRadius: 6, border: `1px solid ${r.passed ? "#22c55e22" : "#ef444433"}`, background: r.passed ? "#0a130a" : "#130a0a", overflow: "hidden" }}>
+              <div key={r.tc} style={{ borderRadius: 8, border: `1px solid ${r.passed ? "var(--accent-bd)" : "var(--red-bd)"}`, background: r.passed ? "var(--accent-bg)" : "var(--red-bg)", overflow: "hidden" }}>
                 <button
                   onClick={() => !r.passed && toggleExpand(r.tc)}
                   style={{
@@ -290,14 +297,14 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
                 </button>
 
                 {!r.passed && expanded.has(r.tc) && (
-                  <div style={{ borderTop: "1px solid #ef444422", padding: "0.5rem 0.625rem", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                  <div style={{ borderTop: "1px solid var(--red-bd)", padding: "0.5rem 0.625rem", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
                     {r.error ? (
                       <TermBlock color="red" label="error" content={r.error} compact />
                     ) : (
                       <>
-                        <DiffRow label="input" value={r.input} color="#94a3b8" />
-                        <DiffRow label="expected" value={r.expected} color="#86efac" />
-                        <DiffRow label="got" value={r.output || "(ไม่มี output)"} color="#fca5a5" />
+                        <DiffRow label="input" value={r.input} color="var(--text2)" />
+                        <DiffRow label="expected" value={r.expected} color="var(--accent)" />
+                        <DiffRow label="got" value={r.output || "(ไม่มี output)"} color="var(--red)" />
                       </>
                     )}
                   </div>
@@ -321,10 +328,10 @@ function TermBlock({ color, label, content, empty, compact }: {
   compact?: boolean;
 }) {
   const colors = {
-    red:    { bg: "#160808", border: "#ef444433", left: "#ef4444", text: "#fca5a5" },
-    yellow: { bg: "#0f0900", border: "#eab30833", left: "#eab308", text: "#fde68a" },
-    green:  { bg: "#040a04", border: "#22c55e22", left: "#22c55e", text: "#86efac" },
-    orange: { bg: "#0f0700", border: "#f9731633", left: "#f97316", text: "#fdba74" },
+    red:    { bg: "var(--red-bg)", border: "var(--red-bd)", left: "var(--red)", text: "var(--red)" },
+    yellow: { bg: "var(--yellow-bg)", border: "#FDE68A", left: "var(--yellow)", text: "var(--yellow)" },
+    green:  { bg: "var(--accent-bg)", border: "var(--accent-bd)", left: "var(--accent)", text: "var(--accent-dim)" },
+    orange: { bg: "var(--yellow-bg)", border: "#FED7AA", left: "#F97316", text: "#C2410C" },
   };
   const c = colors[color];
   return (
@@ -363,7 +370,7 @@ function MiniSpinner() {
   return (
     <span style={{
       display: "inline-block", width: 11, height: 11,
-      border: "2px solid #0004", borderTop: "2px solid currentColor",
+      border: "2px solid var(--border2)", borderTop: "2px solid currentColor",
       borderRadius: "50%", animation: "spin 0.65s linear infinite", flexShrink: 0,
     }} />
   );

@@ -4,10 +4,10 @@ import Link from "next/link";
 import { Problem } from "@/data/problems";
 import { ProgressRecord } from "@/lib/firestore";
 
-const LEVEL_COLOR: Record<string, string> = {
-  A1: "#22c55e",
-  A2: "#eab308",
-  A3: "#ef4444",
+const LEVEL_STYLE: Record<string, { color: string; bg: string; border: string }> = {
+  A1: { color: "var(--accent)", bg: "var(--accent-bg)", border: "var(--accent-bd)" },
+  A2: { color: "var(--yellow)", bg: "var(--yellow-bg)", border: "#FDE68A" },
+  A3: { color: "var(--red)", bg: "var(--red-bg)", border: "var(--red-bd)" },
 };
 
 interface Props {
@@ -17,30 +17,34 @@ interface Props {
 
 export default function ProblemCard({ problem, progress }: Props) {
   const status = progress?.status;
+  const levelStyle = LEVEL_STYLE[problem.level];
 
   return (
     <Link href={`/problems/${problem.id}`} style={{ textDecoration: "none" }}>
       <div
         style={{
           background: "var(--surface)",
-          border: `1px solid ${status === "solved" ? "#22c55e33" : "var(--border)"}`,
-          borderRadius: 10,
+          border: `1px solid ${status === "solved" ? "var(--accent-bd)" : "var(--border)"}`,
+          borderRadius: 12,
           padding: "0.875rem 1rem",
           display: "flex",
           alignItems: "center",
           gap: "0.75rem",
           cursor: "pointer",
-          transition: "border-color 0.15s, background 0.15s",
+          transition: "border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.1s",
+          boxShadow: "var(--shadow-sm)",
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLDivElement).style.background = "var(--surface2)";
           (e.currentTarget as HTMLDivElement).style.borderColor =
-            status === "solved" ? "#22c55e88" : "var(--border2)";
+            status === "solved" ? "var(--accent-bd)" : "var(--border2)";
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLDivElement).style.background = "var(--surface)";
           (e.currentTarget as HTMLDivElement).style.borderColor =
-            status === "solved" ? "#22c55e33" : "var(--border)";
+            status === "solved" ? "var(--accent-bd)" : "var(--border)";
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-sm)";
         }}
       >
         {/* Status dot */}
@@ -52,9 +56,9 @@ export default function ProblemCard({ problem, progress }: Props) {
             flexShrink: 0,
             background:
               status === "solved"
-                ? "#22c55e"
+                ? "var(--accent)"
                 : status === "attempted"
-                ? "#eab308"
+                ? "var(--yellow)"
                 : "var(--border2)",
           }}
         />
@@ -65,8 +69,9 @@ export default function ProblemCard({ problem, progress }: Props) {
             fontSize: "0.72rem",
             fontWeight: 700,
             fontFamily: "var(--mono)",
-            color: LEVEL_COLOR[problem.level],
-            background: LEVEL_COLOR[problem.level] + "18",
+            color: levelStyle.color,
+            background: levelStyle.bg,
+            border: `1px solid ${levelStyle.border}`,
             padding: "0.15rem 0.45rem",
             borderRadius: 4,
             flexShrink: 0,
@@ -112,6 +117,7 @@ export default function ProblemCard({ problem, progress }: Props) {
                 fontSize: "0.7rem",
                 color: "var(--text3)",
                 background: "var(--surface2)",
+                border: "1px solid var(--border)",
                 padding: "0.1rem 0.4rem",
                 borderRadius: 4,
               }}

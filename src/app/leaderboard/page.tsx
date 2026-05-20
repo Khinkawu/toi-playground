@@ -7,7 +7,7 @@ import { getLeaderboard, UserRecord } from "@/lib/firestore";
 import AppShell from "@/components/AppShell";
 import Image from "next/image";
 
-const LEVEL_COLORS = { A1: "#22c55e", A2: "#eab308", A3: "#ef4444" };
+const LEVEL_COLORS = { A1: "var(--accent)", A2: "var(--yellow)", A3: "var(--red)" };
 
 export default function LeaderboardPage() {
   const { user, loading } = useAuth();
@@ -42,9 +42,9 @@ export default function LeaderboardPage() {
         </p>
 
         {fetching ? (
-          <div style={{ textAlign: "center", padding: "3rem", color: "var(--text3)" }}>กำลังโหลด…</div>
+          <div style={{ textAlign: "center", padding: "3rem", color: "var(--text3)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "var(--shadow-sm)" }}>กำลังโหลด…</div>
         ) : board.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "3rem", color: "var(--text3)" }}>
+          <div style={{ textAlign: "center", padding: "3rem", color: "var(--text3)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "var(--shadow-sm)" }}>
             ยังไม่มีข้อมูล — ลองแก้โจทย์สักข้อแล้วกลับมาดู
           </div>
         ) : (
@@ -52,8 +52,9 @@ export default function LeaderboardPage() {
             style={{
               background: "var(--surface)",
               border: "1px solid var(--border)",
-              borderRadius: 10,
+              borderRadius: 12,
               overflow: "hidden",
+              boxShadow: "var(--shadow-sm)",
             }}
           >
             {/* Header */}
@@ -63,6 +64,7 @@ export default function LeaderboardPage() {
                 gridTemplateColumns: "48px 1fr 80px 80px 80px 80px",
                 padding: "0.5rem 1rem",
                 borderBottom: "1px solid var(--border)",
+                background: "var(--surface2)",
                 fontSize: "0.72rem",
                 color: "var(--text3)",
                 fontWeight: 600,
@@ -89,7 +91,7 @@ export default function LeaderboardPage() {
                     padding: "0.625rem 1rem",
                     borderBottom: i < board.length - 1 ? "1px solid var(--border)" : "none",
                     alignItems: "center",
-                    background: isMe ? "#22c55e08" : "none",
+                    background: isMe ? "var(--accent-bg)" : "var(--surface)",
                     borderLeft: isMe ? "2px solid var(--accent)" : "2px solid transparent",
                     transition: "background 0.1s",
                   }}
@@ -115,7 +117,8 @@ export default function LeaderboardPage() {
                           width: 24,
                           height: 24,
                           borderRadius: "50%",
-                          background: "var(--border2)",
+                          background: "var(--accent-bg)",
+                          border: "1px solid var(--accent-bd)",
                           flexShrink: 0,
                           display: "flex",
                           alignItems: "center",

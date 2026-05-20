@@ -9,7 +9,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
     <div
       style={{
         height: "100%",
-        background: "#0d0d0f",
+        background: "var(--surface)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -54,7 +54,7 @@ export default function Editor({ language, value, onChange }: Props) {
       height="100%"
       language={monacoLang}
       value={value || DEFAULT_CODE[language]}
-      theme="vs-dark"
+      theme="vs"
       onChange={(v) => onChange(v ?? "")}
       options={{
         fontSize: 13,
