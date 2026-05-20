@@ -1,11 +1,12 @@
 export type Language = "cpp" | "c" | "python";
 
-const PISTON_URL = "https://emkc.org/api/v2/piston/execute";
+const JUDGE0_URL = "https://ce.judge0.com/submissions?base64_encoded=false&wait=true";
 
-const LANG_MAP: Record<Language, { language: string; version: string }> = {
-  cpp: { language: "c++", version: "10.2.0" },
-  c: { language: "c", version: "10.2.0" },
-  python: { language: "python", version: "3.10.0" },
+// Judge0 CE language IDs
+const LANG_ID: Record<Language, number> = {
+  cpp:    105, // C++ (GCC 14.1.0)
+  c:      103, // C (GCC 14.1.0)
+  python: 100, // Python (3.12.5)
 };
 
 export interface RunResult {
@@ -18,54 +19,77 @@ export interface RunResult {
   elapsed?: number;
 }
 
+// Judge0 status IDs that indicate compile error
+const COMPILE_ERROR_STATUS = 6;
+// Status IDs for runtime errors
+const RUNTIME_ERROR_STATUSES = new Set([7, 8, 9, 10, 11, 12]);
+
 export async function runCode(
   language: Language,
   code: string,
   stdin = ""
 ): Promise<RunResult> {
-  const { language: lang, version } = LANG_MAP[language];
-  const ext = language === "python" ? "py" : language === "cpp" ? "cpp" : "c";
-
   const t0 = Date.now();
   try {
-    const res = await fetch(PISTON_URL, {
+    const res = await fetch(JUDGE0_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        language: lang,
-        version,
-        files: [{ name: `main.${ext}`, content: code }],
+        language_id: LANG_ID[language],
+        source_code: code,
         stdin,
-        run_timeout: 5000,
-        compile_timeout: 10000,
+        cpu_time_limit: 5,
+        wall_time_limit: 10,
+        memory_limit: 128000,
       }),
     });
 
     if (!res.ok) {
-      return { stdout: "", stderr: `HTTP ${res.status}`, code: null, signal: null };
+      return { stdout: "", stderr: `HTTP ${res.status}`, code: null, signal: null, elapsed: Date.now() - t0 };
     }
 
     const data = await res.json();
-    const run = data.run ?? {};
-    const compile = data.compile;
+    const statusId: number = data.status?.id ?? 0;
+    const elapsed = data.time ? Math.round(parseFloat(data.time) * 1000) : Date.now() - t0;
 
-    if (compile && compile.code !== 0) {
+    if (statusId === COMPILE_ERROR_STATUS) {
       return {
         stdout: "",
-        stderr: compile.stderr || compile.output || "Compile error",
-        code: compile.code,
+        stderr: data.compile_output || data.stderr || "Compile error",
+        code: 1,
         signal: null,
         isCompileError: true,
-        elapsed: Date.now() - t0,
+        elapsed,
+      };
+    }
+
+    if (RUNTIME_ERROR_STATUSES.has(statusId)) {
+      return {
+        stdout: data.stdout ?? "",
+        stderr: data.stderr ?? data.message ?? `Runtime Error (${data.status?.description ?? statusId})`,
+        code: data.exit_code ?? 1,
+        signal: null,
+        elapsed,
+      };
+    }
+
+    // TLE
+    if (statusId === 5) {
+      return {
+        stdout: data.stdout ?? "",
+        stderr: "Time Limit Exceeded",
+        code: null,
+        signal: "TLE",
+        elapsed,
       };
     }
 
     return {
-      stdout: run.stdout ?? "",
-      stderr: run.stderr ?? "",
-      code: run.code ?? null,
-      signal: run.signal ?? null,
-      elapsed: Date.now() - t0,
+      stdout: data.stdout ?? "",
+      stderr: data.stderr ?? "",
+      code: data.exit_code ?? 0,
+      signal: null,
+      elapsed,
     };
   } catch (e) {
     return {
@@ -73,7 +97,7 @@ export async function runCode(
       stderr: "",
       code: null,
       signal: null,
-      error: "ไม่สามารถเชื่อมต่อ Piston API ได้",
+      error: "ไม่สามารถเชื่อมต่อ Judge0 API ได้",
       elapsed: Date.now() - t0,
     };
   }
