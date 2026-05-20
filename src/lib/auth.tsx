@@ -17,7 +17,7 @@ import {
 import { auth } from "./firebase";
 import { ensureUserDoc } from "./firestore";
 
-const ALLOWED_DOMAIN = process.env.NEXT_PUBLIC_ALLOWED_DOMAIN || "tesaban6.ac.th";
+const ALLOWED_DOMAIN = (process.env.NEXT_PUBLIC_ALLOWED_DOMAIN || "tesaban6.ac.th").trim();
 const TEACHER_EMAIL = "mr.bankkawinjp@gmail.com";
 
 function isAllowedEmail(email: string | null | undefined): boolean {
