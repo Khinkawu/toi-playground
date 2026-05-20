@@ -18,6 +18,12 @@ import { auth } from "./firebase";
 import { ensureUserDoc } from "./firestore";
 
 const ALLOWED_DOMAIN = process.env.NEXT_PUBLIC_ALLOWED_DOMAIN || "tesaban6.ac.th";
+const TEACHER_EMAIL = "mr.bankkawinjp@gmail.com";
+
+function isAllowedEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  return email === TEACHER_EMAIL || email.endsWith(`@${ALLOWED_DOMAIN}`);
+}
 
 interface AuthCtx {
   user: User | null;
@@ -36,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u) {
         const domain = u.email?.split("@")[1];
-        if (domain !== ALLOWED_DOMAIN) {
+        if (!isAllowedEmail(u.email)) {
           await signOut(auth);
           setUser(null);
         } else {
@@ -53,22 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async (): Promise<string | null> => {
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ hd: ALLOWED_DOMAIN });
     try {
       const result = await signInWithPopup(auth, provider);
-      const domain = result.user.email?.split("@")[1];
-      if (domain !== ALLOWED_DOMAIN) {
+      if (!isAllowedEmail(result.user.email)) {
         await signOut(auth);
         return `อีเมลต้องเป็น @${ALLOWED_DOMAIN} เท่านั้น`;
       }
       return null;
     } catch (e: unknown) {
       if (e instanceof Error && "code" in e) {
-        const firebaseError = e as { code: string };
-        if (firebaseError.code === "auth/popup-closed-by-user") return null;
-        if (firebaseError.code === "auth/cancelled-popup-request") return null;
+        const code = (e as { code: string }).code;
+        if (code === "auth/popup-closed-by-user") return null;
+        if (code === "auth/cancelled-popup-request") return null;
+        return `เข้าสู่ระบบไม่สำเร็จ (${code})`;
       }
-      return "เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่";
+      return `เข้าสู่ระบบไม่สำเร็จ: ${String(e)}`;
     }
   };
 
