@@ -279,9 +279,10 @@ function CodingSection({
   onPass: () => void;
   alreadyPassed: boolean;
 }) {
-  const [lang, setLang] = useState<"cpp" | "python">("cpp");
-  const [code, setCode] = useState<Record<"cpp" | "python", string>>({
+  const [lang, setLang] = useState<"cpp" | "c" | "python">("cpp");
+  const [code, setCode] = useState<Record<"cpp" | "c" | "python", string>>({
     cpp: section.starterCode.cpp,
+    c: section.starterCode.c,
     python: section.starterCode.python,
   });
   const [busy, setBusy] = useState(false);
@@ -298,7 +299,7 @@ function CodingSection({
     setResults([]);
     setExpanded(new Set());
 
-    const pistonLang: Language = lang;
+    const pistonLang: Language = lang as Language;
     const tempResults: TestResult[] = [];
 
     for (const tc of section.testCases) {
@@ -412,7 +413,7 @@ function CodingSection({
           background: "#0f0f14",
         }}
       >
-        {(["cpp", "python"] as const).map((l) => (
+        {(["cpp", "c", "python"] as const).map((l) => (
           <button
             key={l}
             onClick={() => setLang(l)}
@@ -428,7 +429,7 @@ function CodingSection({
               cursor: "pointer",
             }}
           >
-            {l === "cpp" ? "C++" : "Python"}
+            {l === "cpp" ? "C++" : l === "c" ? "C" : "Python"}
           </button>
         ))}
 
@@ -498,7 +499,7 @@ function CodingSection({
       <div style={{ height: 240, borderBottom: "1px solid var(--border)" }}>
         <MonacoEditor
           height="100%"
-          language={lang === "cpp" ? "cpp" : "python"}
+          language={lang === "python" ? "python" : "cpp"}
           value={code[lang]}
           theme="vs-dark"
           onChange={(v) => setCode((prev) => ({ ...prev, [lang]: v ?? "" }))}
