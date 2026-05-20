@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { getLeaderboard, UserRecord } from "@/lib/firestore";
-import Navbar from "@/components/Navbar";
+import AppShell from "@/components/AppShell";
 import Image from "next/image";
 
 const LEVEL_COLORS = { A1: "#22c55e", A2: "#eab308", A3: "#ef4444" };
@@ -32,8 +32,7 @@ export default function LeaderboardPage() {
   const MEDAL = ["🥇", "🥈", "🥉"];
 
   return (
-    <div style={{ minHeight: "100dvh", background: "var(--bg)" }}>
-      <Navbar />
+    <AppShell>
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "1.5rem 1rem" }}>
         <h1 style={{ margin: "0 0 0.25rem", fontSize: "1.35rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
           อันดับผู้เรียน
@@ -161,6 +160,6 @@ export default function LeaderboardPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }

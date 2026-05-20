@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { getAllProgress, ProgressRecord } from "@/lib/firestore";
 import { PROBLEMS, LEVELS, Level, getProblemsByLevel } from "@/data/problems";
 import ProblemCard from "@/components/ProblemCard";
-import Navbar from "@/components/Navbar";
+import AppShell from "@/components/AppShell";
 
 export default function ProblemsPage() {
   const { user, loading } = useAuth();
@@ -47,9 +47,7 @@ export default function ProblemsPage() {
   if (loading || !user) return null;
 
   return (
-    <div style={{ minHeight: "100dvh", background: "var(--bg)" }}>
-      <Navbar />
-
+    <AppShell>
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "1.5rem 1rem" }}>
         {/* Header */}
         <div style={{ marginBottom: "1.5rem" }}>
@@ -179,6 +177,6 @@ export default function ProblemsPage() {
           )}
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
