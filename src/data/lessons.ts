@@ -17,8 +17,11 @@ export type SectionCoding = {
 };
 export type Section = SectionContent | SectionQuiz | SectionCoding;
 
+export type Lang = "c" | "cpp" | "python";
+
 export type Lesson = {
   id: string;
+  lang?: Lang;
   order: number;
   title: string;
   description: string;
@@ -1783,3 +1786,19 @@ print(min(nums))`,
 export const LESSON_MAP = new Map<string, Lesson>(
   LESSONS.map((l) => [l.id, l])
 );
+
+// ─── Per-language lesson maps (lazy-imported in pages) ────────────────────────
+export { LESSONS_CPP } from "./lessons-cpp";
+export { LESSONS_C } from "./lessons-c";
+export { LESSONS_PYTHON } from "./lessons-python";
+
+export function getLessonsByLang(lang: Lang): Lesson[] {
+  // Imported dynamically to avoid circular deps — pages import directly
+  return [];
+}
+
+export const LANG_LESSON_MAP: Record<Lang, () => Promise<Lesson[]>> = {
+  cpp: () => import("./lessons-cpp").then((m) => m.LESSONS_CPP),
+  c:   () => import("./lessons-c").then((m) => m.LESSONS_C),
+  python: () => import("./lessons-python").then((m) => m.LESSONS_PYTHON),
+};
