@@ -257,12 +257,14 @@ function CodingSection({
   section,
   onPass,
   alreadyPassed,
+  defaultLang = "cpp",
 }: {
   section: SectionCoding;
   onPass: () => void;
   alreadyPassed: boolean;
+  defaultLang?: "cpp" | "c" | "python";
 }) {
-  const [lang, setLang] = useState<"cpp" | "c" | "python">("cpp");
+  const [lang, setLang] = useState<"cpp" | "c" | "python">(defaultLang);
   const [code, setCode] = useState<Record<"cpp" | "c" | "python", string>>({
     cpp: section.starterCode.cpp,
     c: section.starterCode.c,
@@ -663,6 +665,12 @@ export default function LessonPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
+  const [defaultLang, setDefaultLang] = useState<"cpp" | "c" | "python">("cpp");
+
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("lang");
+    if (param === "c" || param === "cpp" || param === "python") setDefaultLang(param);
+  }, []);
 
   const lesson = LESSON_MAP.get(id);
 
@@ -839,6 +847,7 @@ export default function LessonPage() {
                 section={section}
                 alreadyPassed={completedExercises.has(section.id)}
                 onPass={() => handleExercisePass(section.id)}
+                defaultLang={defaultLang}
               />
             );
           }

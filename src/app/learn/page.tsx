@@ -8,9 +8,39 @@ import { getAllLessonProgress, LessonProgress } from "@/lib/firestore";
 import { LESSONS } from "@/data/lessons";
 import AppShell from "@/components/AppShell";
 
+type LangTrack = "c" | "cpp" | "python";
+
+const LANG_META: Record<LangTrack, { label: string; fullLabel: string; color: string; bg: string; bd: string; desc: string }> = {
+  c: {
+    label: "C",
+    fullLabel: "ภาษา C",
+    color: "var(--blue)",
+    bg: "var(--blue-bg)",
+    bd: "var(--blue-bd)",
+    desc: "เร็ว ควบคุม memory โดยตรง · embedded systems",
+  },
+  cpp: {
+    label: "C++",
+    fullLabel: "ภาษา C++",
+    color: "var(--accent)",
+    bg: "var(--accent-bg)",
+    bd: "var(--accent-bd)",
+    desc: "competitive programming · สอวน. นิยมใช้มากที่สุด",
+  },
+  python: {
+    label: "Python",
+    fullLabel: "ภาษา Python",
+    color: "var(--yellow)",
+    bg: "var(--yellow-bg)",
+    bd: "#FDE68A",
+    desc: "เขียนง่าย สั้น · data science · scripting",
+  },
+};
+
 export default function LearnPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [langTrack, setLangTrack] = useState<LangTrack>("cpp");
   const [progressMap, setProgressMap] = useState<Record<string, LessonProgress>>({});
 
   useEffect(() => {
@@ -51,10 +81,10 @@ export default function LearnPage() {
       >
         <div>
           <h1 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 700, letterSpacing: "-0.025em", color: "var(--text)" }}>
-            บทเรียนทั้งหมด
+            บทเรียน
           </h1>
           <p style={{ margin: "0.2rem 0 0", fontSize: "0.82rem", color: "var(--text3)" }}>
-            เรียนรู้การเขียนโปรแกรม C · C++ · Python จากศูนย์
+            เลือกภาษาที่ต้องการเรียน แล้วเริ่มได้เลย
           </p>
         </div>
 
@@ -65,18 +95,74 @@ export default function LearnPage() {
             alignItems: "center",
             gap: "0.625rem",
             padding: "0.5rem 1rem",
-            background: "var(--accent-bg)",
-            border: "1px solid var(--accent-bd)",
+            background: LANG_META[langTrack].bg,
+            border: `1px solid ${LANG_META[langTrack].bd}`,
             borderRadius: 50,
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={LANG_META[langTrack].color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
-          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
+          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: LANG_META[langTrack].color }}>
             {completedCount} / {LESSONS.length} บทเรียน
           </span>
         </div>
+      </div>
+
+      {/* ─── Language track selector ─── */}
+      <div
+        style={{
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--border)",
+          padding: "0.875rem 1.75rem",
+          display: "flex",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        {(Object.entries(LANG_META) as [LangTrack, typeof LANG_META[LangTrack]][]).map(([key, meta]) => {
+          const active = langTrack === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setLangTrack(key)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.625rem",
+                padding: "0.625rem 1.125rem",
+                borderRadius: 10,
+                background: active ? meta.bg : "var(--surface2)",
+                border: `1.5px solid ${active ? meta.bd : "var(--border)"}`,
+                cursor: "pointer",
+                transition: "all 0.15s",
+                textAlign: "left",
+                fontFamily: "inherit",
+                boxShadow: active ? "var(--shadow-sm)" : "none",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontWeight: 800,
+                  fontSize: "0.85rem",
+                  color: active ? meta.color : "var(--text3)",
+                  minWidth: 32,
+                }}
+              >
+                {meta.label}
+              </span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <span style={{ fontSize: "0.78rem", fontWeight: 600, color: active ? meta.color : "var(--text2)" }}>
+                  {meta.fullLabel}
+                </span>
+                <span style={{ fontSize: "0.65rem", color: "var(--text3)", lineHeight: 1.3 }}>
+                  {meta.desc}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       <div style={{ padding: "1.75rem" }}>
@@ -230,6 +316,9 @@ export default function LearnPage() {
                     <span style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", color: "var(--text3)", fontWeight: 600, background: "var(--surface2)", padding: "0.1rem 0.4rem", borderRadius: 4, border: "1px solid var(--border)" }}>
                       {lesson.id}
                     </span>
+                    <span style={{ fontFamily: "var(--mono)", fontSize: "0.65rem", fontWeight: 700, color: LANG_META[langTrack].color, background: LANG_META[langTrack].bg, padding: "0.1rem 0.4rem", borderRadius: 4, border: `1px solid ${LANG_META[langTrack].bd}` }}>
+                      {LANG_META[langTrack].label}
+                    </span>
                     {inProgress && (
                       <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "var(--yellow)", background: "var(--yellow-bg)", padding: "0.1rem 0.45rem", borderRadius: 4, border: "1px solid #FDE68A", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                         กำลังเรียน
@@ -270,7 +359,7 @@ export default function LearnPage() {
             );
 
             return unlocked ? (
-              <Link key={lesson.id} href={`/learn/${lesson.id}`} style={{ textDecoration: "none", display: "block" }}>
+              <Link key={lesson.id} href={`/learn/${lesson.id}?lang=${langTrack}`} style={{ textDecoration: "none", display: "block" }}>
                 {card}
               </Link>
             ) : (
