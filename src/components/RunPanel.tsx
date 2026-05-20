@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Language, runCode, checkAnswer, RunResult } from "@/lib/piston";
 import { Problem } from "@/data/problems";
 
@@ -14,304 +14,292 @@ interface Props {
 
 type Tab = "run" | "judge";
 
+interface JudgeItem {
+  tc: number;
+  label?: string;
+  input: string;
+  expected: string;
+  passed: boolean;
+  output: string;
+  error?: string;
+  elapsed?: number;
+}
+
 export default function RunPanel({ problem, code, language, onSolved, onAttempted }: Props) {
   const [tab, setTab] = useState<Tab>("run");
   const [stdin, setStdin] = useState(problem.examples[0]?.input ?? "");
   const [result, setResult] = useState<RunResult | null>(null);
   const [busy, setBusy] = useState(false);
-  const [judgeResults, setJudgeResults] = useState<
-    Array<{ tc: number; passed: boolean; output: string; expected: string; label?: string }>
-  >([]);
-  const [judged, setJudged] = useState(false);
 
-  const handleRun = async () => {
+  // Judge state
+  const [judgeItems, setJudgeItems] = useState<JudgeItem[]>([]);
+  const [judgeProgress, setJudgeProgress] = useState(0);
+  const [judgeTotal, setJudgeTotal] = useState(0);
+  const [judged, setJudged] = useState(false);
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+  const handleRun = useCallback(async () => {
+    if (busy) return;
     setBusy(true);
     setResult(null);
     const r = await runCode(language, code, stdin);
     setResult(r);
     setBusy(false);
     onAttempted?.();
-  };
+  }, [busy, language, code, stdin, onAttempted]);
 
-  const handleJudge = async () => {
+  const handleJudge = useCallback(async () => {
+    if (busy) return;
     setBusy(true);
     setJudged(false);
+    setJudgeItems([]);
+    setExpanded(new Set());
     const tcs = [...problem.examples, ...problem.testCases];
-    const results = [];
+    setJudgeTotal(tcs.length);
+    setJudgeProgress(0);
+    const results: JudgeItem[] = [];
     for (let i = 0; i < tcs.length; i++) {
+      setJudgeProgress(i + 1);
       const tc = tcs[i];
       const r = await runCode(language, code, tc.input);
-      const actual = r.error ? "" : r.stdout;
+      const actual = r.error || r.isCompileError ? "" : r.stdout;
+      const passed = !r.error && !r.isCompileError && checkAnswer(tc.expectedOutput, actual);
       results.push({
         tc: i + 1,
-        passed: checkAnswer(tc.expectedOutput, actual),
-        output: actual,
-        expected: tc.expectedOutput,
         label: tc.label,
+        input: tc.input,
+        expected: tc.expectedOutput,
+        passed,
+        output: actual,
+        error: r.error || (r.isCompileError ? r.stderr : r.code !== 0 && r.code !== null ? `exit ${r.code}${r.stderr ? "\n" + r.stderr : ""}` : undefined),
+        elapsed: r.elapsed,
       });
+      setJudgeItems([...results]);
     }
-    setJudgeResults(results);
     setJudged(true);
     setBusy(false);
     const allPassed = results.every((r) => r.passed);
     if (allPassed) onSolved?.();
     else onAttempted?.();
+  }, [busy, problem, language, code, onSolved, onAttempted]);
+
+  // Ctrl+Enter / Cmd+Enter to run
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (tab === "run") handleRun();
+        else handleJudge();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [tab, handleRun, handleJudge]);
+
+  const toggleExpand = (tc: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      next.has(tc) ? next.delete(tc) : next.add(tc);
+      return next;
+    });
   };
 
-  const allPassed = judged && judgeResults.every((r) => r.passed);
+  const passedCount = judgeItems.filter((r) => r.passed).length;
+  const allPassed = judged && passedCount === judgeItems.length;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        background: "var(--surface)",
-        borderTop: "1px solid var(--border)",
-      }}
-    >
-      {/* Tabs + Buttons */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.25rem",
-          padding: "0.5rem 0.75rem",
-          borderBottom: "1px solid var(--border)",
-          flexShrink: 0,
-        }}
-      >
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
+
+      {/* Tab bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.4rem 0.75rem", borderBottom: "1px solid var(--border)", flexShrink: 0, background: "#111113" }}>
         {(["run", "judge"] as Tab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            style={{
-              padding: "0.25rem 0.75rem",
-              fontSize: "0.8rem",
-              fontWeight: 500,
-              background: tab === t ? "var(--surface2)" : "none",
-              color: tab === t ? "var(--text)" : "var(--text3)",
-              border: tab === t ? "1px solid var(--border2)" : "1px solid transparent",
-              borderRadius: 6,
-              cursor: "pointer",
-            }}
-          >
-            {t === "run" ? "Run" : "Judge"}
+          <button key={t} onClick={() => setTab(t)} style={{
+            padding: "0.2rem 0.65rem", fontSize: "0.78rem", fontWeight: 600,
+            background: tab === t ? "#1e1e23" : "transparent",
+            color: tab === t ? "var(--text)" : "var(--text3)",
+            border: tab === t ? "1px solid var(--border2)" : "1px solid transparent",
+            borderRadius: 5, cursor: "pointer",
+          }}>
+            {t === "run" ? "▶  Run" : "✓  Judge"}
           </button>
         ))}
-
         <div style={{ flex: 1 }} />
-
+        <span style={{ fontSize: "0.68rem", color: "var(--text3)", fontFamily: "var(--mono)", marginRight: "0.5rem" }}>
+          ⌘↵
+        </span>
         <button
           onClick={tab === "run" ? handleRun : handleJudge}
           disabled={busy}
           style={{
-            padding: "0.3rem 1rem",
-            fontSize: "0.82rem",
-            fontWeight: 600,
-            background: busy ? "var(--surface2)" : "var(--accent)",
-            color: busy ? "var(--text2)" : "#000",
-            border: "none",
-            borderRadius: 6,
-            cursor: busy ? "not-allowed" : "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.375rem",
-            transition: "background 0.15s",
+            padding: "0.3rem 0.875rem", fontSize: "0.8rem", fontWeight: 700,
+            background: busy ? "#1a1a1f" : tab === "run" ? "var(--accent)" : "#3b82f6",
+            color: busy ? "var(--text3)" : "#000",
+            border: "none", borderRadius: 5, cursor: busy ? "not-allowed" : "pointer",
+            display: "flex", alignItems: "center", gap: "0.375rem",
+            transition: "background 0.1s",
+            opacity: busy ? 0.6 : 1,
           }}
         >
-          {busy ? (
-            <>
-              <Spinner dark={false} />
-              {tab === "run" ? "รัน…" : "ตรวจ…"}
-            </>
-          ) : tab === "run" ? (
-            "▶ Run"
-          ) : (
-            "✓ Judge All"
-          )}
+          {busy ? <><MiniSpinner /> {tab === "run" ? "รัน…" : `${judgeProgress}/${judgeTotal}`}</> : tab === "run" ? "Run" : "Judge All"}
         </button>
       </div>
 
       {/* Body */}
-      <div style={{ flex: 1, overflow: "auto", padding: "0.75rem" }}>
+      <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+
+        {/* ── RUN TAB ── */}
         {tab === "run" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", height: "100%" }}>
-            {/* Input */}
-            <div>
-              <label
-                style={{ fontSize: "0.72rem", color: "var(--text3)", display: "block", marginBottom: "0.3rem" }}
-              >
-                Input (stdin)
-              </label>
-              <div style={{ display: "flex", gap: "0.3rem", marginBottom: "0.3rem", flexWrap: "wrap" }}>
-                {problem.examples.map((ex, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setStdin(ex.input)}
-                    style={{
-                      fontSize: "0.7rem",
-                      padding: "0.1rem 0.5rem",
-                      background: "var(--surface2)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 4,
-                      color: "var(--text2)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {ex.label ?? `ตัวอย่าง ${i + 1}`}
-                  </button>
-                ))}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 0 }}>
+
+            {/* Input section */}
+            <div style={{ padding: "0.625rem 0.75rem 0", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.35rem" }}>
+                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>stdin</span>
+                <div style={{ display: "flex", gap: "0.25rem" }}>
+                  {problem.examples.map((ex, i) => (
+                    <button key={i} onClick={() => setStdin(ex.input)} style={{
+                      fontSize: "0.65rem", padding: "0.1rem 0.45rem",
+                      background: stdin === ex.input ? "#22c55e22" : "var(--surface2)",
+                      border: `1px solid ${stdin === ex.input ? "#22c55e44" : "var(--border)"}`,
+                      borderRadius: 3, color: stdin === ex.input ? "var(--accent)" : "var(--text3)", cursor: "pointer",
+                    }}>
+                      {ex.label ?? `ตย.${i + 1}`}
+                    </button>
+                  ))}
+                </div>
               </div>
               <textarea
                 value={stdin}
                 onChange={(e) => setStdin(e.target.value)}
-                rows={4}
+                rows={3}
+                spellCheck={false}
                 style={{
-                  width: "100%",
-                  background: "#0a0a0f",
-                  border: "1px solid var(--border)",
-                  borderRadius: 6,
-                  color: "var(--text)",
-                  fontFamily: "var(--mono)",
-                  fontSize: "0.82rem",
-                  padding: "0.5rem 0.75rem",
-                  resize: "vertical",
-                  outline: "none",
+                  width: "100%", boxSizing: "border-box",
+                  background: "#0c0c10", border: "1px solid var(--border)",
+                  borderRadius: 5, color: "var(--text)", fontFamily: "var(--mono)",
+                  fontSize: "0.82rem", padding: "0.4rem 0.625rem",
+                  resize: "vertical", outline: "none", lineHeight: 1.5,
                 }}
               />
             </div>
 
-            {/* Output */}
-            {result && (
-              <div>
-                <label
-                  style={{ fontSize: "0.72rem", color: "var(--text3)", display: "block", marginBottom: "0.3rem" }}
-                >
-                  Output {result.code !== null && result.code !== 0 && `(exit ${result.code})`}
-                </label>
-                {result.error && (
-                  <div
-                    style={{
-                      background: "#1a0505",
-                      border: "1px solid #ef444444",
-                      borderRadius: 6,
-                      padding: "0.5rem 0.75rem",
-                      color: "var(--red)",
-                      fontSize: "0.82rem",
-                    }}
-                  >
-                    {result.error}
-                  </div>
-                )}
-                {result.stderr && (
-                  <div
-                    style={{
-                      background: "#0f0a00",
-                      border: "1px solid #eab30844",
-                      borderLeft: "3px solid var(--yellow)",
-                      borderRadius: "0 6px 6px 0",
-                      padding: "0.5rem 0.75rem",
-                      color: "#fde68a",
-                      fontFamily: "var(--mono)",
-                      fontSize: "0.78rem",
-                      whiteSpace: "pre-wrap",
-                      marginBottom: "0.375rem",
-                    }}
-                  >
-                    {result.stderr}
-                  </div>
-                )}
-                {result.stdout !== undefined && (
-                  <pre
-                    style={{
-                      background: "#040407",
-                      border: "1px solid #1a2a1a",
-                      borderLeft: "3px solid var(--accent)",
-                      borderRadius: "0 6px 6px 0",
-                      padding: "0.5rem 0.75rem",
-                      color: "#86efac",
-                      fontFamily: "var(--mono)",
-                      fontSize: "0.82rem",
-                      whiteSpace: "pre-wrap",
-                      margin: 0,
-                    }}
-                  >
-                    {result.stdout || <span style={{ color: "var(--text3)" }}>(ไม่มี output)</span>}
-                  </pre>
+            {/* Output section */}
+            <div style={{ flex: 1, padding: "0.5rem 0.75rem 0.75rem", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>output</span>
+                {result && (
+                  <span style={{ fontSize: "0.65rem", fontFamily: "var(--mono)", color: result.isCompileError ? "var(--red)" : result.code !== 0 && result.code !== null ? "#f97316" : "var(--text3)" }}>
+                    {result.isCompileError ? "● compile error" : result.signal ? `● ${result.signal}` : result.code !== null && result.code !== 0 ? `● exit ${result.code}` : result.elapsed ? `${result.elapsed}ms` : ""}
+                  </span>
                 )}
               </div>
-            )}
+
+              {!result && !busy && (
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text3)", fontSize: "0.8rem", background: "#0c0c10", borderRadius: 5, border: "1px solid var(--border)", minHeight: 80 }}>
+                  กด Run เพื่อดู output
+                </div>
+              )}
+
+              {busy && (
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "var(--text3)", fontSize: "0.8rem", background: "#0c0c10", borderRadius: 5, border: "1px solid var(--border)", minHeight: 80 }}>
+                  <MiniSpinner /> กำลังรัน…
+                </div>
+              )}
+
+              {result && !busy && (
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.375rem", minHeight: 0 }}>
+                  {result.error && (
+                    <TermBlock color="red" label="⚠ Network Error" content={result.error} />
+                  )}
+                  {result.isCompileError && result.stderr && (
+                    <TermBlock color="red" label="⚑ Compile Error" content={result.stderr} />
+                  )}
+                  {!result.isCompileError && result.stderr && (
+                    <TermBlock color="yellow" label="⚠ stderr" content={result.stderr} />
+                  )}
+                  {!result.isCompileError && !result.error && (
+                    <TermBlock
+                      color={result.code !== 0 && result.code !== null ? "orange" : "green"}
+                      label="stdout"
+                      content={result.stdout}
+                      empty="(ไม่มี output)"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
+        {/* ── JUDGE TAB ── */}
         {tab === "judge" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {!judged && !busy && (
-              <p style={{ color: "var(--text3)", fontSize: "0.82rem", textAlign: "center", marginTop: "2rem" }}>
-                กด Judge All เพื่อตรวจทุก test case
-              </p>
-            )}
+          <div style={{ flex: 1, padding: "0.625rem 0.75rem", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
 
-            {judged && (
-              <div
-                style={{
-                  padding: "0.5rem 0.75rem",
-                  background: allPassed ? "#0a1a0a" : "#1a0a0a",
-                  border: `1px solid ${allPassed ? "#22c55e44" : "#ef444444"}`,
-                  borderRadius: 6,
-                  fontSize: "0.82rem",
-                  fontWeight: 600,
-                  color: allPassed ? "var(--accent)" : "var(--red)",
-                  textAlign: "center",
-                }}
-              >
-                {allPassed
-                  ? `🎉 ผ่านทุก test case (${judgeResults.length}/${judgeResults.length})`
-                  : `ผ่าน ${judgeResults.filter((r) => r.passed).length}/${judgeResults.length} test case`}
+            {!judged && !busy && (
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text3)", fontSize: "0.82rem" }}>
+                กด Judge All เพื่อตรวจทุก test case
               </div>
             )}
 
-            {judgeResults.map((r) => (
-              <div
-                key={r.tc}
-                style={{
-                  background: r.passed ? "#0a130a" : "#130a0a",
-                  border: `1px solid ${r.passed ? "#22c55e22" : "#ef444422"}`,
-                  borderRadius: 6,
-                  padding: "0.5rem 0.75rem",
-                  fontSize: "0.78rem",
-                }}
-              >
-                <div
+            {/* Progress bar while running */}
+            {busy && judgeTotal > 0 && (
+              <div style={{ marginBottom: "0.375rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text2)" }}>กำลังตรวจ test case {judgeProgress}/{judgeTotal}</span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--accent)" }}>{judgeItems.filter(r => r.passed).length} ✓</span>
+                </div>
+                <div style={{ height: 3, background: "var(--border)", borderRadius: 9 }}>
+                  <div style={{ height: "100%", background: "var(--accent)", borderRadius: 9, width: `${(judgeProgress / judgeTotal) * 100}%`, transition: "width 0.2s" }} />
+                </div>
+              </div>
+            )}
+
+            {/* Summary banner */}
+            {judged && (
+              <div style={{
+                padding: "0.5rem 0.75rem", borderRadius: 6, fontSize: "0.82rem", fontWeight: 700, textAlign: "center",
+                background: allPassed ? "#0a1a0a" : "#1a0a0a",
+                border: `1px solid ${allPassed ? "#22c55e44" : "#ef444444"}`,
+                color: allPassed ? "var(--accent)" : "var(--red)",
+              }}>
+                {allPassed ? `🎉 ผ่านทุก test case (${judgeItems.length}/${judgeItems.length})` : `ผ่าน ${passedCount}/${judgeItems.length} test case`}
+              </div>
+            )}
+
+            {/* Test case list */}
+            {judgeItems.map((r) => (
+              <div key={r.tc} style={{ borderRadius: 6, border: `1px solid ${r.passed ? "#22c55e22" : "#ef444433"}`, background: r.passed ? "#0a130a" : "#130a0a", overflow: "hidden" }}>
+                <button
+                  onClick={() => !r.passed && toggleExpand(r.tc)}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    marginBottom: r.passed ? 0 : "0.375rem",
+                    width: "100%", display: "flex", alignItems: "center", gap: "0.5rem",
+                    padding: "0.45rem 0.625rem", background: "transparent",
+                    border: "none", cursor: r.passed ? "default" : "pointer", textAlign: "left",
                   }}
                 >
-                  <span style={{ color: r.passed ? "var(--accent)" : "var(--red)" }}>
+                  <span style={{ fontFamily: "var(--mono)", fontSize: "0.8rem", fontWeight: 700, color: r.passed ? "var(--accent)" : "var(--red)", flexShrink: 0 }}>
                     {r.passed ? "✓" : "✗"}
                   </span>
-                  <span style={{ color: "var(--text2)", fontWeight: 600 }}>
-                    Test {r.tc} {r.label ? `— ${r.label}` : ""}
+                  <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text2)", flex: 1 }}>
+                    Test {r.tc}{r.label ? ` — ${r.label}` : ""}
                   </span>
-                </div>
-                {!r.passed && (
-                  <div style={{ display: "flex", gap: "0.5rem", flexDirection: "column" }}>
-                    <div>
-                      <span style={{ color: "var(--text3)" }}>คาดหวัง: </span>
-                      <code style={{ fontFamily: "var(--mono)", color: "#86efac" }}>
-                        {r.expected.replace(/\n/g, "↵")}
-                      </code>
-                    </div>
-                    <div>
-                      <span style={{ color: "var(--text3)" }}>ได้รับ: </span>
-                      <code style={{ fontFamily: "var(--mono)", color: "#fca5a5" }}>
-                        {r.output.replace(/\n/g, "↵") || "(ไม่มี output)"}
-                      </code>
-                    </div>
+                  {r.elapsed && <span style={{ fontSize: "0.65rem", color: "var(--text3)", fontFamily: "var(--mono)" }}>{r.elapsed}ms</span>}
+                  {!r.passed && (
+                    <span style={{ fontSize: "0.7rem", color: "var(--text3)" }}>{expanded.has(r.tc) ? "▲" : "▼"}</span>
+                  )}
+                </button>
+
+                {!r.passed && expanded.has(r.tc) && (
+                  <div style={{ borderTop: "1px solid #ef444422", padding: "0.5rem 0.625rem", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                    {r.error ? (
+                      <TermBlock color="red" label="error" content={r.error} compact />
+                    ) : (
+                      <>
+                        <DiffRow label="input" value={r.input} color="#94a3b8" />
+                        <DiffRow label="expected" value={r.expected} color="#86efac" />
+                        <DiffRow label="got" value={r.output || "(ไม่มี output)"} color="#fca5a5" />
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -323,18 +311,60 @@ export default function RunPanel({ problem, code, language, onSolved, onAttempte
   );
 }
 
-function Spinner({ dark }: { dark: boolean }) {
+// ── Helpers ──
+
+function TermBlock({ color, label, content, empty, compact }: {
+  color: "red" | "yellow" | "green" | "orange";
+  label: string;
+  content: string;
+  empty?: string;
+  compact?: boolean;
+}) {
+  const colors = {
+    red:    { bg: "#160808", border: "#ef444433", left: "#ef4444", text: "#fca5a5" },
+    yellow: { bg: "#0f0900", border: "#eab30833", left: "#eab308", text: "#fde68a" },
+    green:  { bg: "#040a04", border: "#22c55e22", left: "#22c55e", text: "#86efac" },
+    orange: { bg: "#0f0700", border: "#f9731633", left: "#f97316", text: "#fdba74" },
+  };
+  const c = colors[color];
   return (
-    <span
-      style={{
-        display: "inline-block",
-        width: 12,
-        height: 12,
-        border: `2px solid ${dark ? "#444" : "#0009"}`,
-        borderTop: `2px solid ${dark ? "#ccc" : "#0006"}`,
-        borderRadius: "50%",
-        animation: "spin 0.7s linear infinite",
-      }}
-    />
+    <div style={{ background: c.bg, border: `1px solid ${c.border}`, borderLeft: `3px solid ${c.left}`, borderRadius: "0 5px 5px 0" }}>
+      <div style={{ padding: "0.2rem 0.5rem", borderBottom: content ? `1px solid ${c.border}` : "none" }}>
+        <span style={{ fontSize: "0.65rem", fontWeight: 700, color: c.left, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
+      </div>
+      {content && (
+        <pre style={{
+          margin: 0, padding: compact ? "0.35rem 0.5rem" : "0.5rem 0.625rem",
+          fontFamily: "var(--mono)", fontSize: "0.8rem", color: c.text,
+          whiteSpace: "pre-wrap", wordBreak: "break-all", lineHeight: 1.6,
+        }}>
+          {content}
+        </pre>
+      )}
+      {!content && empty && (
+        <div style={{ padding: "0.4rem 0.625rem", fontSize: "0.78rem", color: "var(--text3)", fontStyle: "italic" }}>{empty}</div>
+      )}
+    </div>
+  );
+}
+
+function DiffRow({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div style={{ display: "flex", gap: "0.5rem", alignItems: "flex-start" }}>
+      <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.04em", minWidth: 52, paddingTop: "0.1rem" }}>{label}</span>
+      <pre style={{ margin: 0, fontFamily: "var(--mono)", fontSize: "0.78rem", color, whiteSpace: "pre-wrap", wordBreak: "break-all", lineHeight: 1.5, flex: 1 }}>
+        {value}
+      </pre>
+    </div>
+  );
+}
+
+function MiniSpinner() {
+  return (
+    <span style={{
+      display: "inline-block", width: 11, height: 11,
+      border: "2px solid #0004", borderTop: "2px solid currentColor",
+      borderRadius: "50%", animation: "spin 0.65s linear infinite", flexShrink: 0,
+    }} />
   );
 }

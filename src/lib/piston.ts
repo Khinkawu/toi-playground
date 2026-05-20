@@ -14,6 +14,8 @@ export interface RunResult {
   code: number | null;
   signal: string | null;
   error?: string;
+  isCompileError?: boolean;
+  elapsed?: number;
 }
 
 export async function runCode(
@@ -24,6 +26,7 @@ export async function runCode(
   const { language: lang, version } = LANG_MAP[language];
   const ext = language === "python" ? "py" : language === "cpp" ? "cpp" : "c";
 
+  const t0 = Date.now();
   try {
     const res = await fetch(PISTON_URL, {
       method: "POST",
@@ -52,6 +55,8 @@ export async function runCode(
         stderr: compile.stderr || compile.output || "Compile error",
         code: compile.code,
         signal: null,
+        isCompileError: true,
+        elapsed: Date.now() - t0,
       };
     }
 
@@ -60,6 +65,7 @@ export async function runCode(
       stderr: run.stderr ?? "",
       code: run.code ?? null,
       signal: run.signal ?? null,
+      elapsed: Date.now() - t0,
     };
   } catch (e) {
     return {
@@ -68,6 +74,7 @@ export async function runCode(
       code: null,
       signal: null,
       error: "ไม่สามารถเชื่อมต่อ Piston API ได้",
+      elapsed: Date.now() - t0,
     };
   }
 }
