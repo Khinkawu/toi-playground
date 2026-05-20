@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import Image from "next/image";
 
 export default function LoginPage() {
   const { signInWithGoogle, user, loading } = useAuth();
@@ -37,7 +38,7 @@ export default function LoginPage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "2.5rem",
-          background: "linear-gradient(160deg, #14532D 0%, #16A34A 60%, #22C55E 100%)",
+          background: "linear-gradient(160deg, #0A4670 0%, #1591DC 60%, #4FB5EC 100%)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -56,24 +57,28 @@ export default function LoginPage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 44,
-                height: 44,
+                width: 48,
+                height: 48,
                 background: "rgba(255,255,255,.2)",
                 border: "1px solid rgba(255,255,255,.3)",
                 backdropFilter: "blur(8px)",
                 borderRadius: 12,
-                fontFamily: "var(--mono)",
-                fontWeight: 800,
-                fontSize: "0.9rem",
-                color: "#fff",
-                letterSpacing: "-0.01em",
+                flexShrink: 0,
               }}
             >
-              TOI
+              <Image
+                src="/school-logo.png"
+                alt="โรงเรียนเทศบาล 6"
+                width={40}
+                height={40}
+                style={{ objectFit: "contain" }}
+              />
             </span>
             <div>
-              <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "#fff" }}>Playground</div>
-              <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,.7)" }}>สอวน. คอมพิวเตอร์</div>
+              <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "#fff" }}>
+                TOI<span style={{ opacity: 0.7 }}>·</span>Playground
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,.7)" }}>สอวน. คอมพิวเตอร์ · ทต.6 นครเชียงราย</div>
             </div>
           </div>
 
@@ -146,16 +151,12 @@ export default function LoginPage() {
               justifyContent: "center",
               width: 52,
               height: 52,
-              background: "var(--accent)",
+              background: "transparent",
               borderRadius: 13,
-              fontFamily: "var(--mono)",
-              fontWeight: 800,
-              fontSize: "1rem",
-              color: "#fff",
               marginBottom: "0.75rem",
             }}
           >
-            TOI
+            <Image src="/school-logo.png" alt="โรงเรียนเทศบาล 6" width={48} height={48} style={{ objectFit: "contain" }} />
           </div>
           <div style={{ fontWeight: 700, fontSize: "1.35rem", color: "var(--text)", letterSpacing: "-0.02em" }}>
             TOI<span style={{ color: "var(--accent)" }}>·</span>Playground

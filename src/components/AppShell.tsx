@@ -56,7 +56,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {/* ─── Sidebar ─────────────────────────────────────────── */}
       <aside
         style={{
-          width: 248,
+          width: "var(--sidebar-w)",
           flexShrink: 0,
           background: "var(--sidebar)",
           borderRight: "1px solid var(--border)",
@@ -66,15 +66,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
           top: 0,
           height: "100dvh",
           overflowY: "auto",
-          boxShadow: "1px 0 0 var(--border)",
         }}
       >
-        {/* Logo area */}
+        {/* Brand area */}
         <div style={{ padding: "1.375rem 1.375rem 1rem" }}>
-          <Link
-            href="/learn"
-            style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}
-          >
+          <Link href="/learn" style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}>
+            {/* School emblem chip */}
             <span
               style={{
                 display: "flex",
@@ -82,30 +79,23 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 justifyContent: "center",
                 width: 36,
                 height: 36,
-                background: "var(--accent)",
-                borderRadius: 10,
-                fontFamily: "var(--mono)",
-                fontWeight: 800,
-                fontSize: "0.78rem",
-                color: "#fff",
                 flexShrink: 0,
-                letterSpacing: "-0.01em",
-                boxShadow: "0 2px 8px rgba(22,163,74,.35)",
+                borderRadius: 10,
+                background: "transparent",
               }}
             >
-              TOI
+              <Image
+                src="/school-logo.png"
+                alt="โรงเรียนเทศบาล 6"
+                width={32}
+                height={32}
+                style={{ objectFit: "contain" }}
+              />
             </span>
+            {/* Wordmark */}
             <div>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: "0.975rem",
-                  color: "var(--text)",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.2,
-                }}
-              >
-                Playground
+              <div style={{ fontWeight: 700, fontSize: "0.975rem", color: "var(--text)", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+                TOI<span style={{ color: "var(--accent)" }}>·</span>Playground
               </div>
               <div style={{ fontSize: "0.62rem", color: "var(--text3)", letterSpacing: "0.01em" }}>
                 สอวน. คอมพิวเตอร์
@@ -136,7 +126,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* Nav section label */}
+        {/* Eyebrow */}
         <div
           style={{
             padding: "0.125rem 1.375rem 0.5rem",
@@ -150,8 +140,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
           เมนูหลัก
         </div>
 
-        {/* Nav links */}
-        <nav style={{ padding: "0 0.875rem", display: "flex", flexDirection: "column", gap: "2px" }}>
+        {/* Nav */}
+        <nav style={{ padding: "0 0.875rem", display: "flex", flexDirection: "column", gap: 2 }}>
           {NAV.map(({ href, label, icon }) => {
             const active = pathname.startsWith(href);
             return (
@@ -169,7 +159,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   fontSize: "0.875rem",
                   fontWeight: active ? 600 : 400,
                   textDecoration: "none",
-                  transition: "background 0.12s, color 0.12s",
+                  transition: "background var(--ease-fast), color var(--ease-fast)",
                   position: "relative",
                 }}
               >
@@ -187,13 +177,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                     }}
                   />
                 )}
-                <span
-                  style={{
-                    opacity: active ? 1 : 0.55,
-                    display: "flex",
-                    color: active ? "var(--accent)" : "var(--text2)",
-                  }}
-                >
+                <span style={{ opacity: active ? 1 : 0.55, display: "flex", color: active ? "var(--accent)" : "var(--text2)" }}>
                   {icon}
                 </span>
                 {label}
@@ -202,13 +186,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Spacer */}
         <div style={{ flex: 1 }} />
 
-        {/* Divider */}
         <div style={{ height: 1, background: "var(--border)", margin: "0 1.375rem 0.875rem" }} />
 
-        {/* User area */}
+        {/* User */}
         {user && (
           <div style={{ padding: "0 0.875rem 1.375rem" }}>
             <div
@@ -233,44 +215,20 @@ export default function AppShell({ children }: { children: ReactNode }) {
               ) : (
                 <div
                   style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
+                    width: 30, height: 30, borderRadius: "50%",
                     background: "var(--accent)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "0.78rem",
-                    fontWeight: 700,
-                    color: "#fff",
-                    flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "0.78rem", fontWeight: 700, color: "#fff", flexShrink: 0,
                   }}
                 >
                   {user.displayName?.charAt(0) ?? "?"}
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    color: "var(--text)",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {user.displayName ?? "ผู้เรียน"}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.65rem",
-                    color: "var(--text3)",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <div style={{ fontSize: "0.65rem", color: "var(--text3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {user.email}
                 </div>
               </div>
@@ -279,20 +237,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <button
               onClick={handleLogout}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                width: "100%",
-                marginTop: "0.375rem",
-                padding: "0.45rem 0.75rem",
-                background: "transparent",
-                border: "none",
-                borderRadius: 8,
-                color: "var(--text3)",
-                fontSize: "0.78rem",
-                cursor: "pointer",
-                transition: "color 0.12s, background 0.12s",
-                textAlign: "left",
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                width: "100%", marginTop: "0.375rem",
+                padding: "0.45rem 0.75rem", background: "transparent",
+                border: "none", borderRadius: 8, color: "var(--text3)",
+                fontSize: "0.78rem", cursor: "pointer",
+                transition: "color var(--ease-fast), background var(--ease-fast)",
+                textAlign: "left", fontFamily: "inherit",
               }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

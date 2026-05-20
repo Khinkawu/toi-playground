@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import Image from "next/image";
+import NextImage from "next/image";
 
 const NAV = [
   { href: "/learn", label: "เนื้อหา" },
@@ -39,24 +40,8 @@ export default function Navbar() {
     >
       {/* Brand */}
       <Link href="/learn" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 30,
-            height: 30,
-            background: "var(--accent)",
-            borderRadius: 8,
-            fontFamily: "var(--mono)",
-            fontWeight: 800,
-            fontSize: "0.72rem",
-            color: "#fff",
-            flexShrink: 0,
-            boxShadow: "0 2px 6px rgba(22,163,74,.3)",
-          }}
-        >
-          TOI
+        <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, flexShrink: 0 }}>
+          <NextImage src="/school-logo.png" alt="โรงเรียนเทศบาล 6" width={28} height={28} style={{ objectFit: "contain" }} />
         </span>
         <div>
           <div style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.02em", color: "var(--text)", lineHeight: 1.2 }}>
