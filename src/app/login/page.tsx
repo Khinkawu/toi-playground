@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 
@@ -10,10 +10,11 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const router = useRouter();
 
-  if (!loading && user) {
-    router.replace("/problems");
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/problems");
+    }
+  }, [loading, user, router]);
 
   const handleLogin = async () => {
     setBusy(true);
