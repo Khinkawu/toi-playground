@@ -13,7 +13,7 @@ import {
 } from "@/lib/firestore";
 import { runCode, checkAnswer, Language } from "@/lib/piston";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
-import Navbar from "@/components/Navbar";
+import AppShell from "@/components/AppShell";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -745,18 +745,11 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <div style={{ minHeight: "100dvh", background: "var(--bg)" }}>
-        <Navbar />
-        <div
-          style={{
-            padding: "4rem",
-            textAlign: "center",
-            color: "var(--text3)",
-          }}
-        >
+      <AppShell>
+        <div style={{ padding: "4rem", textAlign: "center", color: "var(--text3)" }}>
           ไม่พบบทเรียน {id}
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -776,93 +769,91 @@ export default function LessonPage() {
     : 0;
 
   return (
-    <div style={{ minHeight: "100dvh", background: "var(--bg)" }}>
-      <Navbar />
-
-      {/* Sub-header */}
+    <AppShell>
+      {/* Sub-header / breadcrumb */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: "0.625rem",
-          padding: "0.5rem 1rem",
+          padding: "0.625rem 1.5rem",
           borderBottom: "1px solid var(--border)",
-          background: "var(--surface)",
+          background: "#111115",
           flexShrink: 0,
+          flexWrap: "wrap",
         }}
       >
         <Link
           href="/learn"
           style={{
-            fontSize: "0.8rem",
+            fontSize: "0.78rem",
             color: "var(--text3)",
             display: "flex",
             alignItems: "center",
             gap: "0.25rem",
+            textDecoration: "none",
+            transition: "color 0.12s",
           }}
         >
-          ← เนื้อหา
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          เนื้อหา
         </Link>
-        <span style={{ color: "var(--border2)" }}>·</span>
-        <span
-          style={{
-            fontFamily: "var(--mono)",
-            fontSize: "0.75rem",
-            color: "var(--text3)",
-          }}
-        >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--border2)" }}>
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span style={{ fontFamily: "var(--mono)", fontSize: "0.72rem", color: "var(--text3)" }}>
           {lesson.id}
         </span>
-        <span
-          style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--text)" }}
-        >
+        <span style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--text)" }}>
           {lesson.title}
         </span>
-
         {lessonDone && (
           <span
             style={{
-              fontSize: "0.72rem",
-              fontWeight: 600,
+              fontSize: "0.68rem",
+              fontWeight: 700,
               color: "var(--accent)",
-              background: "#22c55e18",
+              background: "#22c55e14",
               padding: "0.15rem 0.5rem",
               borderRadius: 4,
-              border: "1px solid #22c55e33",
+              border: "1px solid #22c55e28",
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
             }}
           >
             ✓ เสร็จแล้ว
           </span>
         )}
-      </div>
 
-      {/* Progress bar */}
-      <div
-        style={{
-          height: 3,
-          background: "var(--border)",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${progressPct}%`,
-            background: "var(--accent)",
-            transition: "width 0.5s ease",
-          }}
-        />
+        <div style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "flex-end" }}>
+          <span style={{ fontSize: "0.7rem", color: "var(--text3)", fontFamily: "var(--mono)", flexShrink: 0 }}>
+            {completedInteractives}/{totalInteractives}
+          </span>
+          <div style={{ width: 80, height: 5, background: "var(--border)", borderRadius: 5, overflow: "hidden" }}>
+            <div
+              style={{
+                height: "100%",
+                width: `${progressPct}%`,
+                background: "linear-gradient(90deg, #16a34a, #22c55e)",
+                borderRadius: 5,
+                transition: "width 0.5s ease",
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "2rem 1rem 4rem" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
         {/* Title */}
         <h1
           style={{
             margin: "0 0 0.375rem",
-            fontSize: "1.5rem",
+            fontSize: "1.6rem",
             fontWeight: 700,
-            letterSpacing: "-0.02em",
+            letterSpacing: "-0.03em",
           }}
         >
           {lesson.title}
@@ -1034,6 +1025,6 @@ export default function LessonPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }

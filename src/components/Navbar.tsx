@@ -57,16 +57,14 @@ export default function Navbar() {
         >
           TZ
         </span>
-        <span
-          style={{
-            fontWeight: 700,
-            fontSize: "0.95rem",
-            letterSpacing: "-0.02em",
-            color: "var(--text)",
-          }}
-        >
-          TOI<span style={{ color: "var(--accent)" }}>·</span>Playground
-        </span>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: "0.925rem", letterSpacing: "-0.02em", color: "var(--text)", lineHeight: 1.2 }}>
+            TOI<span style={{ color: "var(--accent)" }}>·</span>Playground
+          </div>
+          <div style={{ fontSize: "0.6rem", color: "var(--text3)", lineHeight: 1 }}>
+            ทต.6 นครเชียงราย
+          </div>
+        </div>
       </Link>
 
       {/* Spacer */}
